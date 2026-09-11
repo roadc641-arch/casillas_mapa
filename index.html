@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Prueba de datos - Casillas de Peones Camineros</title>
+  <style>
+    body{font-family:Arial,sans-serif;max-width:850px;margin:40px auto;padding:0 18px;color:#172033}
+    .ok{padding:18px;border:1px solid #d8d2c8;border-radius:10px;background:#f7f3ec}
+    code{background:#eee;padding:2px 5px;border-radius:4px}
+  </style>
+</head>
+<body>
+  <h1>Prueba de datos</h1>
+  <div class="ok" id="estado">Cargando datos...</div>
+
+  <script src="casillas_peones_camineros.js"></script>
+  <script>
+    (function(){
+      var el=document.getElementById('estado');
+      var fc=window.CASILLAS_PEONES_GEOJSON;
+      if(!fc || !fc.features){
+        el.innerHTML='No se pudieron cargar los datos.';
+        return;
+      }
+      el.innerHTML=
+        '<strong>Correcto.</strong><br><br>'+
+        'Casillas cargadas: <strong>'+fc.features.length+'</strong><br>'+
+        'Archivo disponible: <code>casillas_peones_camineros.js</code>';
+    })();
+  </script>
+</body>
+</html>
