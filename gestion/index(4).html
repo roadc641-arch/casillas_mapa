@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gestión Web · Patrimonio Caminero</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{
+  --ink:#172033;--muted:#687487;--line:#dce2e8;--bg:#f3f1ec;--panel:#fff;--brand:#b55b24;
+  --cpc:#C85D19;--avc:#B76A2C;--mon:#23834A;--pos:#C9363E;--eop:#2F6FA5;
+  --shadow:0 12px 30px rgba(24,36,52,.12);
+}
+*{box-sizing:border-box}html,body{margin:0;height:100%;font-family:Inter,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+button,input,select{font:inherit}a{color:inherit;text-decoration:none}
+.app{height:100vh;display:grid;grid-template-columns:230px 360px 1fr 390px;gap:10px;padding:10px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;min-height:0}
+.nav{background:#172033;color:#fff;display:flex;flex-direction:column}
+.brand{padding:18px 16px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand h1{font:700 23px Georgia,serif;margin:0;color:#fff}
+.brand .site{font-size:10px;color:#7cb6ff;font-weight:800;margin-top:5px}
+.brand .mode{display:inline-flex;margin-top:9px;padding:4px 8px;border-radius:999px;background:#26344a;color:#e7edf5;font-size:9px;font-weight:900}
+.nav a,.nav button{border:0;background:transparent;color:#d7dee7;text-align:left;padding:11px 14px;margin:2px 8px;border-radius:9px;font-weight:700;font-size:12px;cursor:pointer}
+.nav a.active,.nav a:hover,.nav button:hover{background:#26344a;color:#fff}
+.nav .spacer{flex:1}
+.nav .small{font-size:10px;color:#8795a8;padding:12px 15px;line-height:1.4}
+.sidebar{display:flex;flex-direction:column}
+.head{padding:14px;border-bottom:1px solid var(--line);background:linear-gradient(135deg,#fff8f1,#fff)}
+.head h2{font:700 22px Georgia,serif;margin:0}.head p{font-size:10px;color:var(--muted);margin:4px 0 0}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.stat{border:1px solid #eadfd4;background:#fffaf5;border-radius:10px;padding:8px}.stat b{display:block;font:700 20px Georgia,serif}.stat span{font-size:9px;color:#6b7482}
+.search{padding:10px;border-bottom:1px solid var(--line)}
+.search input,.search select{width:100%;border:1px solid #cfd6dd;border-radius:9px;padding:9px;background:#fff}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:7px}
+.list{overflow:auto;flex:1}
+.item{position:relative;padding:10px 12px 10px 15px;border-bottom:1px solid var(--line);cursor:pointer}
+.item:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--cat,#bbb)}
+.item:hover{background:#faf7f2}.item.active{background:#fff1e3}
+.name{font:700 15px Georgia,serif}.meta{font-size:10px;color:#5d6978;line-height:1.4;margin-top:3px}.id{font-size:9px;color:#929aa5;margin-top:4px}
+.badge{display:inline-flex;padding:3px 7px;border-radius:999px;font-size:9px;font-weight:900;margin:5px 4px 0 0}
+.cpc{background:#fce6d6;color:#9f4715}.avc{background:#f5e6d5;color:#8b5428}.mon{background:#dff2e5;color:#26743f}.pos{background:#f9dee0;color:#a82b33}.eop{background:#dceaf5;color:#315f84}
+.green{background:#dff4e6;color:#176e3a}.gold{background:#fff0b8;color:#735600}.gray{background:#edf1f4;color:#5f6b78}
+.mapwrap{position:relative}.mapbar{position:absolute;z-index:700;left:12px;top:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none}.mapbar>*{pointer-events:auto}
+.maplabel{background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:10px;padding:8px 11px;font-weight:900;box-shadow:0 4px 14px rgba(0,0,0,.12)}
+.layers{display:flex;gap:6px}.layers button{background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-weight:800}.layers button.active{background:#172033;color:#fff}
+#map{height:100%;width:100%}
+.detail{display:flex;flex-direction:column}.detail-head{padding:15px;border-bottom:1px solid var(--line);background:linear-gradient(135deg,#fff8f1,#fff)}
+.detail-head h2{font:700 23px Georgia,serif;margin:0}.detail-head .sub{font-size:10px;color:var(--muted);margin-top:3px}
+.detail-body{padding:14px;overflow:auto;flex:1}
+.detail-title{font:700 24px Georgia,serif;margin:0 0 4px}.detail-id{font-size:10px;color:#8792a0}
+.grid{display:grid;grid-template-columns:120px 1fr;gap:8px 10px;margin-top:14px;font-size:11px}.grid b{color:#576476}
+.desc{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;line-height:1.55}
+.links{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}.btn{display:inline-flex;border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 10px;font-weight:900;font-size:11px;cursor:pointer}.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.notice{padding:10px;border-radius:10px;background:#eef6fb;border:1px solid #c7ddeb;color:#395a72;font-size:10px;line-height:1.4;margin-top:12px}
+.loading{padding:18px;color:#6c7786;font-size:12px}
+@media(max-width:1200px){.app{grid-template-columns:190px 330px 1fr}.detail{position:fixed;right:10px;top:10px;bottom:10px;width:min(390px,calc(100vw - 20px));z-index:1200}.detail.hidden{display:none}}
+@media(max-width:850px){.app{height:auto;min-height:100vh;grid-template-columns:1fr;padding:6px}.nav{height:auto;flex-direction:row;overflow:auto;position:sticky;top:0;z-index:1600}.brand,.nav .spacer,.nav .small{display:none}.nav a,.nav button{white-space:nowrap}.sidebar{height:480px}.mapwrap{height:560px}.detail{position:static;width:auto;height:auto;min-height:420px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="panel nav">
+    <div class="brand">
+      <h1>Gestión Web</h1>
+      <div class="site">Mapa Caminero</div>
+      <span class="mode">SOLO LECTURA</span>
+    </div>
+    <a class="active" href="#">Catálogo</a>
+    <a href="../mapa.html" target="_blank">Mapa público</a>
+    <a href="https://www.casillasdepeonescamineros.es" target="_blank">Web pública</a>
+    <div class="spacer"></div>
+    <div class="small">Esta primera versión no puede modificar la base maestra.</div>
+  </aside>
+
+  <aside class="panel sidebar">
+    <div class="head">
+      <h2>Catálogo</h2>
+      <p>Base maestra de GitHub</p>
+      <div class="stats">
+        <div class="stat"><b id="total">—</b><span>Elementos</span></div>
+        <div class="stat"><b id="protected">—</b><span>Protegidos</span></div>
+      </div>
+    </div>
+    <div class="search">
+      <input id="q" placeholder="Buscar nombre, carretera, municipio…">
+      <div class="filters">
+        <select id="typeFilter"><option value="">Todos los tipos</option></select>
+        <select id="provinceFilter"><option value="">Todas las provincias</option></select>
+      </div>
+      <div class="filters">
+        <select id="stateFilter"><option value="">Todos los estados</option></select>
+        <select id="protectionFilter">
+          <option value="">Toda protección</option>
+          <option value="SI">Protegidos</option>
+          <option value="NO">Sin protección conocida</option>
+        </select>
+      </div>
+    </div>
+    <div id="list" class="list"><div class="loading">Cargando base maestra…</div></div>
+  </aside>
+
+  <main class="panel mapwrap">
+    <div class="mapbar">
+      <div class="maplabel">Consulta y geometrías</div>
+      <div class="layers">
+        <button id="bIgn" class="active">IGN</button>
+        <button id="bPnoa">PNOA</button>
+        <button id="bAmer">1956–57</button>
+      </div>
+    </div>
+    <div id="map"></div>
+  </main>
+
+  <aside class="panel detail" id="detail">
+    <div class="detail-head">
+      <h2>Ficha</h2>
+      <div class="sub">Selecciona un elemento del catálogo</div>
+    </div>
+    <div class="detail-body" id="detailBody">
+      <div class="notice">La Gestión Web v1 es de <b>solo lectura</b>. Sirve para comprobar que la gestión puede trabajar directamente con la base maestra de GitHub sin riesgo de modificarla.</div>
+    </div>
+  </aside>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(async()=>{
+"use strict";
+const $=id=>document.getElementById(id);
+const TYPES={
+ CPC:{name:"Casilla de peones camineros",short:"Casillas",color:"#C85D19",cls:"cpc"},
+ AVC:{name:"Agrupación de viviendas de camineros",short:"Agrupaciones",color:"#B76A2C",cls:"avc"},
+ MON:{name:"Monumento / escultura",short:"Monumentos",color:"#23834A",cls:"mon"},
+ POS:{name:"Casa de postas",short:"Postas",color:"#C9363E",cls:"pos"},
+ EOP:{name:"Edificio / instalación de O.P.",short:"O.P.",color:"#2F6FA5",cls:"eop"}
+};
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+
+let data;
+try{
+  let r=await fetch("../datos/patrimonio_caminero.geojson?v="+Date.now(),{cache:"no-store"});
+  if(!r.ok) throw new Error("relative");
+  data=await r.json();
+}catch(e){
+  try{
+    const r=await fetch("https://roadc641-arch.github.io/casillas_mapa/datos/patrimonio_caminero.geojson?v="+Date.now(),{cache:"no-store"});
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    data=await r.json();
+  }catch(err){
+    $("list").innerHTML='<div class="loading">No se pudo cargar la base maestra.</div>';
+    return;
+  }
+}
+const features=Array.isArray(data.features)?data.features:[];
+$("total").textContent=features.length.toLocaleString("es-ES");
+$("protected").textContent=features.filter(f=>(f.properties||{}).Protegido==="SI").length.toLocaleString("es-ES");
+
+const provinces=[...new Set(features.map(f=>(f.properties||{}).Provincia_Distrito).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
+const states=[...new Set(features.map(f=>(f.properties||{}).Estado_categoria).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
+Object.entries(TYPES).forEach(([k,v])=>$("typeFilter").add(new Option(v.short,k)));
+provinces.forEach(v=>$("provinceFilter").add(new Option(v,v)));
+states.forEach(v=>$("stateFilter").add(new Option(v,v)));
+
+const map=L.map("map",{zoomControl:true}).setView([40.1,-3.7],6);
+const ign=L.tileLayer("https://www.ign.es/wmts/ign-base?service=WMTS&request=GetTile&version=1.0.0&layer=IGNBaseTodo&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{maxZoom:19,attribution:"© IGN"}).addTo(map);
+const pnoa=L.tileLayer("https://www.ign.es/wmts/pnoa-ma?service=WMTS&request=GetTile&version=1.0.0&layer=OI.OrthoimageCoverage&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{maxZoom:20,attribution:"© IGN · PNOA"});
+const amer=L.tileLayer.wms("https://www.ign.es/wms/pnoa-historico",{layers:"AMS_1956-1957",format:"image/jpeg",transparent:false,version:"1.3.0",attribution:"© IGN · Vuelo Americano 1956–57",maxZoom:20});
+function setBase(layer,id){
+ [ign,pnoa,amer].forEach(x=>map.hasLayer(x)&&map.removeLayer(x));layer.addTo(map);
+ ["bIgn","bPnoa","bAmer"].forEach(x=>$(x).classList.toggle("active",x===id));
+}
+$("bIgn").onclick=()=>setBase(ign,"bIgn");$("bPnoa").onclick=()=>setBase(pnoa,"bPnoa");$("bAmer").onclick=()=>setBase(amer,"bAmer");
+
+const layerGroup=L.layerGroup().addTo(map);
+let selectedId=null, selectedLayer=null;
+const markerById=new Map();
+
+function cat(f){return (f.properties||{}).Tipo_codigo||"CPC"}
+function idOf(f){return String((f.properties||{}).ID||"")}
+function pointOf(f){
+ const p=f.properties||{};
+ if(Number.isFinite(+p.Latitud)&&Number.isFinite(+p.Longitud))return [+p.Latitud,+p.Longitud];
+ if(f.geometry?.type==="Point")return [f.geometry.coordinates[1],f.geometry.coordinates[0]];
+ return null;
+}
+function icon(code){
+ const c=TYPES[code]?.color||"#777";
+ return L.divIcon({className:"",html:`<div style="width:15px;height:15px;border-radius:50%;background:${c};border:2px solid #fff;box-shadow:0 1px 4px #0008"></div>`,iconSize:[15,15],iconAnchor:[7,7]});
+}
+function geometryLayer(f){
+ const c=TYPES[cat(f)]?.color||"#777";
+ if(f.geometry?.type==="Point"){
+   const ll=pointOf(f);return ll?L.marker(ll,{icon:icon(cat(f))}):null;
+ }
+ if(f.geometry){
+   return L.geoJSON(f.geometry,{style:{color:c,weight:4,fillOpacity:.15}});
+ }
+ const ll=pointOf(f);return ll?L.marker(ll,{icon:icon(cat(f))}):null;
+}
+features.forEach(f=>{
+ const l=geometryLayer(f); if(!l)return;
+ l.addTo(layerGroup); markerById.set(idOf(f),l);
+ l.on("click",()=>selectFeature(f,true));
+});
+
+function searchText(f){
+ const p=f.properties||{};
+ return [p.ID,p.Nombre,p.Carretera_actual,p.Carretera_historica,p.Municipio_Concelho,p.Localidad,p.Provincia_Distrito,p.Descripcion]
+   .filter(Boolean).join(" ").toLowerCase();
+}
+function filtered(){
+ const q=$("q").value.trim().toLowerCase(),t=$("typeFilter").value,pr=$("provinceFilter").value,st=$("stateFilter").value,prot=$("protectionFilter").value;
+ return features.filter(f=>{
+   const p=f.properties||{};
+   return (!q||searchText(f).includes(q))&&(!t||p.Tipo_codigo===t)&&(!pr||p.Provincia_Distrito===pr)&&(!st||p.Estado_categoria===st)&&(!prot||p.Protegido===prot);
+ });
+}
+function renderList(){
+ const rows=filtered(); const box=$("list");box.innerHTML="";
+ rows.slice(0,700).forEach(f=>{
+   const p=f.properties||{},t=TYPES[cat(f)]||TYPES.CPC;
+   const d=document.createElement("div");d.className="item"+(selectedId===idOf(f)?" active":"");d.style.setProperty("--cat",t.color);
+   d.innerHTML=`<div class="name">${esc(p.Nombre||t.name)}</div>
+   <div class="meta">${esc([p.Carretera_actual,p.PK?"PK "+p.PK:""].filter(Boolean).join(" · ")||"Sin carretera")}<br>${esc([p.Municipio_Concelho,p.Provincia_Distrito].filter(Boolean).join(" · "))}</div>
+   <span class="badge ${t.cls}">${esc(t.short)}</span>
+   <span class="badge ${p.Protegido==="SI"?"gold":"gray"}">${p.Protegido==="SI"?"Protegido":"Sin protección"}</span>
+   <span class="badge green">${esc(p.Estado_categoria||"Desconocido")}</span>
+   <div class="id">${esc(p.ID||"")}</div>`;
+   d.onclick=()=>selectFeature(f,true);box.appendChild(d);
+ });
+ if(rows.length>700){
+   const more=document.createElement("div");more.className="loading";more.textContent=`Mostrando 700 de ${rows.length.toLocaleString("es-ES")}. Usa los filtros para afinar.`;box.appendChild(more);
+ }
+ if(!rows.length)box.innerHTML='<div class="loading">No hay resultados.</div>';
+}
+function selectFeature(f,zoom){
+ selectedId=idOf(f); const p=f.properties||{},t=TYPES[cat(f)]||TYPES.CPC;
+ const street=(p.Latitud&&p.Longitud)?`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${p.Latitud},${p.Longitud}`:"";
+ const maps=(p.Latitud&&p.Longitud)?`https://www.google.com/maps/search/?api=1&query=${p.Latitud},${p.Longitud}`:"";
+ $("detailBody").innerHTML=`<h3 class="detail-title">${esc(p.Nombre||t.name)}</h3><div class="detail-id">${esc(p.ID||"")}</div>
+ <div><span class="badge ${t.cls}">${esc(t.short)}</span><span class="badge ${p.Protegido==="SI"?"gold":"gray"}">${p.Protegido==="SI"?"Protegido":"Sin protección conocida"}</span><span class="badge green">${esc(p.Estado_categoria||"Desconocido")}</span></div>
+ <div class="grid">
+   <b>Carretera</b><span>${esc(p.Carretera_actual||p.Carretera_historica||"—")}</span>
+   <b>PK</b><span>${esc(p.PK||"—")}</span>
+   <b>Municipio</b><span>${esc(p.Municipio_Concelho||"—")}</span>
+   <b>Provincia</b><span>${esc(p.Provincia_Distrito||"—")}</span>
+   <b>Localidad</b><span>${esc(p.Localidad||"—")}</span>
+   <b>Subtipo</b><span>${esc(p.Subtipo||"—")}</span>
+   <b>Geometría</b><span>${esc(f.geometry?.type||p.Geometria_tipo||"—")}</span>
+ </div>
+ ${p.Descripcion?`<div class="desc">${esc(p.Descripcion)}</div>`:""}
+ <div class="links">${street?`<a class="btn primary" target="_blank" href="${street}">Street View</a>`:""}${maps?`<a class="btn" target="_blank" href="${maps}">Google Maps</a>`:""}${p.Fuente_principal?`<a class="btn" target="_blank" href="${esc(p.Fuente_principal)}">Fuente</a>`:""}</div>
+ <div class="notice">Solo lectura: todavía no se puede editar ni guardar desde esta página.</div>`;
+ const l=markerById.get(selectedId);
+ if(zoom&&l){
+   if(l.getBounds){const b=l.getBounds(); if(b?.isValid())map.fitBounds(b,{padding:[60,60],maxZoom:17});}
+   else if(l.getLatLng)map.setView(l.getLatLng(),17);
+ }
+ renderList();
+}
+["q","typeFilter","provinceFilter","stateFilter","protectionFilter"].forEach(id=>{
+ $(id).addEventListener(id==="q"?"input":"change",renderList);
+});
+renderList();
+})();
+</script>
+</body>
+</html>
