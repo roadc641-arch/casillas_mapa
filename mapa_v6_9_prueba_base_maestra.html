@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>PRUEBA BASE MAESTRA · Mapa del patrimonio caminero de España · v6.8 colores definidos</title>
+<title>Mapa Caminero · prueba base maestra</title>
 <meta name="description" content="Mapa interactivo de casillas de peones camineros, agrupaciones de viviendas, monumentos, casas de postas y edificios de Obras Públicas.">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -32,7 +32,7 @@ a{text-decoration:none}
 }
 .brand,.search,.top-actions{pointer-events:auto}
 .brand{
-  width:286px;display:flex;align-items:center;gap:10px;
+  width:365px;display:flex;align-items:center;gap:10px;
   padding:9px 11px;background:rgba(255,255,255,.97);border:1px solid rgba(20,31,48,.08);
   border-radius:15px;box-shadow:var(--shadow);
 }
@@ -40,8 +40,11 @@ a{text-decoration:none}
   width:46px;height:46px;border-radius:12px;display:grid;place-items:center;
   background:#fff2e5;color:var(--brand);font-size:25px;flex:0 0 auto
 }
-.brand-title{font-family:Georgia,"Times New Roman",serif;font-size:18px;font-weight:700;line-height:1.05}
-.brand-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.brand-text{min-width:0;line-height:1.08}
+.brand-title{font-family:Georgia,"Times New Roman",serif;font-size:20px;font-weight:700;line-height:1.02}
+.brand-web{display:block;margin-top:3px;font-size:11px;font-weight:700;color:#2f79cf;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand-web:hover{text-decoration:underline}
+.brand-update{font-size:10px;color:var(--muted);margin-top:3px;white-space:nowrap}
 
 .search{
   flex:1;max-width:760px;display:flex;background:rgba(255,255,255,.98);
@@ -378,9 +381,10 @@ a{text-decoration:none}
   <header class="topbar">
     <div class="brand">
       <div class="brand-mark">⌂</div>
-      <div>
-        <div class="brand-title">Patrimonio caminero</div>
-        <div class="brand-sub">Casillas de Peones Camineros de España · Provincias INE · v6.8</div>
+      <div class="brand-text">
+        <div class="brand-title">Mapa Caminero</div>
+        <a class="brand-web" href="https://www.casillasdepeonescamineros.es" target="_blank" rel="noopener">www.casillasdepeonescamineros.es</a>
+        <div class="brand-update">Actualización: <span id="brandUpdateDate">—</span></div>
       </div>
     </div>
 
@@ -538,6 +542,17 @@ if(!window.L || !data || !Array.isArray(data.features)){
 }
 
 console.info("Base maestra cargada desde datos/patrimonio_caminero.geojson:", data.features.length, "registros");
+
+function formatUpdateDate(value){
+  if(!value) return "Sin fecha";
+  const s=String(value).slice(0,10);
+  const parts=s.split("-");
+  if(parts.length!==3) return value;
+  const d=new Date(Number(parts[0]),Number(parts[1])-1,Number(parts[2]));
+  return new Intl.DateTimeFormat("es-ES",{day:"numeric",month:"long",year:"numeric"}).format(d);
+}
+const updateValue = data?.metadata?.updated_at || data?.metadata?.fecha || "";
+if($("brandUpdateDate")) $("brandUpdateDate").textContent = formatUpdateDate(updateValue);
 
 const CATEGORY = {
   CPC:{label:"Casillas de peones camineros", short:"Casillas", color:"#C85D19"},
