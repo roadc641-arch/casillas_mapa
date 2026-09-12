@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mapa de Casillas de Peones Camineros</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+html,body{margin:0;padding:0;width:100%;height:100%;font-family:Arial,Helvetica,sans-serif;color:#172033}*{box-sizing:border-box}
+#app{width:100%;min-height:100vh;background:#f5f1e9;padding:14px}.top{margin-bottom:10px}.top h1{margin:0 0 4px;font-family:Georgia,"Times New Roman",serif;font-size:28px}.top p{margin:0;color:#555;font-size:14px}
+.busqueda{display:flex;gap:7px;margin:12px 0 8px}.busqueda input{flex:1;min-width:0;padding:11px;border:1px solid #ccc;border-radius:6px;font-size:14px}button{cursor:pointer;font-weight:bold}#buscarBtn{padding:11px 20px;color:#fff;background:#ad601e;border:0;border-radius:6px}#limpiarBtn{padding:11px 15px;background:#fff;border:1px solid #bbb;border-radius:6px}
+.filtros{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px}.filtros select{width:100%;padding:9px;background:#fff;border:1px solid #ccc;border-radius:5px}.estado{margin:7px 0 10px;font-size:13px}
+.contenido{display:grid;grid-template-columns:300px minmax(0,1fr);gap:10px}.panel{background:#fff;border:1px solid #ddd;border-radius:7px;overflow:hidden}.contador{padding:11px;background:#faf9f6;border-bottom:1px solid #ddd}#lista{height:600px;overflow:auto}.item{padding:11px;border-bottom:1px solid #eee;cursor:pointer}.item:hover{background:#f5f1e9}.nombre{font-family:Georgia,"Times New Roman",serif;font-size:16px;font-weight:bold;margin-bottom:4px}.meta{font-size:12px;line-height:1.45;color:#555}.est{margin-top:4px;font-size:12px;font-weight:bold}
+.mapaWrap{position:relative;min-width:0}#mapa{width:100%;height:640px;background:#ddd;border-radius:7px}#capaActiva{position:absolute;z-index:500;left:9px;bottom:22px;padding:5px 8px;background:rgba(255,255,255,.93);border-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.25);font-size:11px;font-weight:bold;pointer-events:none}
+.popup{min-width:220px;line-height:1.45}.popup h3{font-family:Georgia,"Times New Roman",serif;font-size:17px;margin:0 0 8px}.popup a{display:inline-block;margin-top:8px;margin-right:5px;padding:7px 9px;border-radius:4px;text-decoration:none;font-weight:bold;font-size:12px}.street{background:#ad601e;color:#fff!important}.maps{background:#eee;color:#172033!important}
+@media(max-width:700px){#app{padding:10px}.top h1{font-size:24px}.busqueda{display:block}.busqueda input,.busqueda button{display:block;width:100%;margin-bottom:6px}.filtros{grid-template-columns:1fr}.contenido{display:flex;flex-direction:column}.mapaWrap{order:1}.panel{order:2}#mapa{height:430px}#lista{height:480px}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="top"><h1>Mapa de casillas</h1><p>Inventario y localización de las casillas de peones camineros.</p></div>
+  <div class="busqueda"><input id="q" type="text" placeholder="Buscar casilla, carretera, municipio o provincia..."><button id="buscarBtn" type="button">Buscar</button><button id="limpiarBtn" type="button">Limpiar</button></div>
+  <div class="filtros"><select id="provincia"><option value="">Todas las provincias</option></select><select id="carretera"><option value="">Todas las carreteras</option></select><select id="estado"><option value="">Todos los estados</option><option value="En pie">En pie</option><option value="Ruinas">En ruinas</option><option value="Abandonada">Abandonada</option><option value="Desaparecida / demolida">Desaparecida / demolida</option><option value="Otro / sin clasificar">Otro</option></select></div>
+  <div id="estadoCarga" class="estado">Cargando inventario…</div>
+  <div class="contenido"><div class="panel"><div class="contador"><strong><span id="n">0</span> casillas</strong></div><div id="lista"></div></div><div class="mapaWrap"><div id="mapa"></div><div id="capaActiva">OpenStreetMap</div></div></div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="casillas_peones_camineros.js"></script>
+<script>
+(function(){
+"use strict";
+var cajaEstado=document.getElementById("estadoCarga");
+var datos=window.CASILLAS_PEONES_GEOJSON;
+if(!window.L){cajaEstado.textContent="ERROR: Leaflet no se cargó.";return}
+if(!datos||!Array.isArray(datos.features)){cajaEstado.textContent="ERROR: no se cargó casillas_peones_camineros.js.";return}
+var registros=datos.features.filter(function(f){return f&&f.geometry&&f.geometry.type==="Point"&&Array.isArray(f.geometry.coordinates)&&isFinite(Number(f.geometry.coordinates[0]))&&isFinite(Number(f.geometry.coordinates[1]))});
+var mapa=L.map("mapa",{preferCanvas:true,scrollWheelZoom:false}).setView([40.15,-3.7],6);
+var osm=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"&copy; OpenStreetMap contributors"});
+var ignBase=L.tileLayer("https://www.ign.es/wmts/ign-base?service=WMTS&request=GetTile&version=1.0.0&layer=IGNBaseTodo&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{maxZoom:20,attribution:"&copy; IGN"});
+var ignRaster=L.tileLayer("https://www.ign.es/wmts/mapa-raster?service=WMTS&request=GetTile&version=1.0.0&layer=MTN&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{maxZoom:20,attribution:"&copy; IGN"});
+var pnoa=L.tileLayer("https://www.ign.es/wmts/pnoa-ma?service=WMTS&request=GetTile&version=1.0.0&layer=OI.OrthoimageCoverage&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{maxZoom:20,attribution:"PNOA &copy; IGN-CNIG"});
+var americano=L.tileLayer.wms("https://www.ign.es/wms/pnoa-historico",{layers:"AMS_1956-1957",format:"image/jpeg",transparent:false,version:"1.3.0",attribution:"Vuelo Americano 1956-1957 · IGN"});
+var primera=L.tileLayer("https://www.ign.es/wmts/primera-edicion-mtn?service=WMTS&request=GetTile&version=1.0.0&layer=mtn50-edicion1&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{maxZoom:18,attribution:"Primera edición MTN50 · IGN"});
+var minutas=L.tileLayer("https://www.ign.es/wmts/primera-edicion-mtn?service=WMTS&request=GetTile&version=1.0.0&layer=catastrones&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{maxZoom:18,attribution:"Minutas MTN50 · IGN"});
+osm.addTo(mapa);
+var capaPuntos=L.layerGroup().addTo(mapa);
+L.control.layers({"OpenStreetMap":osm,"IGN · Mapa base":ignBase,"IGN · Mapa ráster":ignRaster,"PNOA · Actual":pnoa,"Vuelo Americano · 1956–57":americano,"MTN50 · Primera edición":primera,"Minutas MTN50":minutas},{"Casillas de peones camineros":capaPuntos},{collapsed:true}).addTo(mapa);
+L.control.scale({imperial:false}).addTo(mapa);
+mapa.on("baselayerchange",function(e){document.getElementById("capaActiva").textContent=e.name});
+var renderer=L.canvas({padding:0.5});
+function esc(v){return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;")}
+function normalizar(v){return String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")}
+function color(e){if(e==="En pie")return"#26884f";if(e==="Ruinas")return"#d48a23";if(e==="Abandonada")return"#956e45";if(e==="Desaparecida / demolida")return"#c73535";return"#777"}
+function popup(f){var p=f.properties||{},lon=Number(f.geometry.coordinates[0]),lat=Number(f.geometry.coordinates[1]);var street=p.street_view||("https://www.google.com/maps/@?api=1&map_action=pano&viewpoint="+lat+","+lon);var maps="https://www.google.com/maps/search/?api=1&query="+lat+","+lon;return '<div class="popup"><h3>'+esc(p.nombre||"Casilla de peones camineros")+'</h3><b>Carretera:</b> '+esc(p.carretera||"—")+'<br><b>PK:</b> '+esc(p.pk||"—")+'<br><b>Municipio:</b> '+esc(p.municipio||"—")+'<br><b>Provincia:</b> '+esc(p.provincia||"—")+'<br><b>Estado:</b> '+esc(p.estado_actual||p.estado_categoria||"—")+'<br><a class="street" target="_blank" rel="noopener" href="'+esc(street)+'">Street View</a><a class="maps" target="_blank" rel="noopener" href="'+esc(maps)+'">Google Maps</a></div>'}
+function unicos(campo){var s=new Set();registros.forEach(function(f){var v=(f.properties||{})[campo];if(v)s.add(String(v).trim())});return Array.from(s).sort(function(a,b){return a.localeCompare(b,"es",{numeric:true,sensitivity:"base"})})}
+function llenar(id,campo){var sel=document.getElementById(id);unicos(campo).forEach(function(v){var o=document.createElement("option");o.value=v;o.textContent=v;sel.appendChild(o)})}
+llenar("provincia","provincia");llenar("carretera","carretera");
+var actuales=registros.slice(), markerPorId=new Map();
+function dibujar(features){capaPuntos.clearLayers();markerPorId.clear();var bounds=[];features.forEach(function(f){var p=f.properties||{},lon=Number(f.geometry.coordinates[0]),lat=Number(f.geometry.coordinates[1]),categoria=p.estado_categoria||"Otro / sin clasificar";var m=L.circleMarker([lat,lon],{renderer:renderer,radius:5,color:"#fff",weight:1,fillColor:color(categoria),fillOpacity:.95});m.bindPopup(popup(f));capaPuntos.addLayer(m);bounds.push([lat,lon]);if(p.id!=null)markerPorId.set(p.id,m)});actuales=features;document.getElementById("n").textContent=features.length;pintarLista();if(bounds.length)mapa.fitBounds(bounds,{padding:[20,20],maxZoom:7})}
+function pintarLista(){var lista=document.getElementById("lista");lista.innerHTML="";var max=Math.min(actuales.length,200);for(var i=0;i<max;i++){(function(f){var p=f.properties||{},div=document.createElement("div");div.className="item";div.innerHTML='<div class="nombre">'+esc(p.nombre||"Casilla")+'</div><div class="meta">'+esc([p.carretera,p.pk?"PK "+p.pk:""].filter(Boolean).join(" · "))+(p.municipio||p.provincia?'<br>':'')+esc([p.municipio,p.provincia].filter(Boolean).join(" · "))+'</div><div class="est" style="color:'+color(p.estado_categoria)+'">● '+esc(p.estado_categoria||"Otro / sin clasificar")+'</div>';div.onclick=function(){var lon=Number(f.geometry.coordinates[0]),lat=Number(f.geometry.coordinates[1]);mapa.setView([lat,lon],15);var m=markerPorId.get(p.id);if(m)m.openPopup()};lista.appendChild(div)})(actuales[i])}}
+function filtrar(){var q=normalizar(document.getElementById("q").value.trim()),prov=document.getElementById("provincia").value,carr=document.getElementById("carretera").value,est=document.getElementById("estado").value;var r=registros.filter(function(f){var p=f.properties||{},texto=normalizar((p.nombre||"")+" "+(p.carretera||"")+" "+(p.pk||"")+" "+(p.municipio||"")+" "+(p.provincia||"")+" "+(p.estado_actual||"")+" "+(p.descripcion_texto||""));return(!q||texto.indexOf(q)!==-1)&&(!prov||p.provincia===prov)&&(!carr||p.carretera===carr)&&(!est||p.estado_categoria===est)});dibujar(r)}
+document.getElementById("buscarBtn").onclick=filtrar;document.getElementById("q").addEventListener("keydown",function(e){if(e.key==="Enter")filtrar()});document.getElementById("provincia").onchange=filtrar;document.getElementById("carretera").onchange=filtrar;document.getElementById("estado").onchange=filtrar;document.getElementById("limpiarBtn").onclick=function(){document.getElementById("q").value="";document.getElementById("provincia").value="";document.getElementById("carretera").value="";document.getElementById("estado").value="";dibujar(registros)};
+cajaEstado.innerHTML="<strong>"+registros.length+" casillas cargadas.</strong>";dibujar(registros);setTimeout(function(){mapa.invalidateSize()},300);
+})();
+</script>
+</body>
+</html>
