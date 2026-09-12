@@ -1,0 +1,19 @@
+{
+  "proyecto": "Patrimonio Caminero de España",
+  "base_maestra": "datos/patrimonio_caminero.geojson",
+  "version_base": "1.0.0",
+  "origen": "base_patrimonio_caminero_v3_3.geojson",
+  "fecha": "2026-09-12",
+  "registros": 2371,
+  "provincias_pendientes": 0,
+  "protegidos": 12,
+  "conteos_por_tipo": {
+    "CPC": 2266,
+    "AVC": 57,
+    "MON": 8,
+    "POS": 3,
+    "EOP": 37
+  },
+  "sha256": "28cf8bfc2e49cb82440cc136c21729081930968773ad3b2e6d35fd9f4299bc85",
+  "nota": "Este archivo identifica la version de la base maestra. El mapa publico aun no se modifica en este paso."
+}
