@@ -1,0 +1,32 @@
+MAPA DEFINITIVO V2 · PATRIMONIO CAMINERO
+
+Contenido:
+- mapa.html
+- datos_patrimonio_caminero_v3.js
+- iconos/casilla.png
+- iconos/agrupacion.png
+- iconos/monumento.png
+- iconos/postas.png
+- iconos/obras_publicas.svg
+
+Base:
+- 2.371 elementos
+- 2.266 Casillas de peones camineros
+- 57 Agrupaciones de viviendas
+- 8 Monumentos / esculturas
+- 3 Casas de postas
+- 37 Edificios / instalaciones de Obras Públicas
+- 12 registros con protección patrimonial conocida
+
+PRUEBA EN GITHUB:
+1. Sube la carpeta/contenido al repositorio casillas_mapa.
+2. Para no sustituir aún tu mapa anterior, puedes renombrar mapa.html como mapa_v2.html antes de subirlo.
+3. Mantén la carpeta iconos con sus cinco archivos.
+4. Mantén datos_patrimonio_caminero_v3.js junto al HTML.
+
+Cuando esté aprobado:
+- este mapa pasará a llamarse mapa.html
+- Jimdo seguirá apuntando a /mapa.html
+
+NOTA:
+El icono EOP (Obras Públicas) es provisional. Los cuatro iconos CPC/AVC/MON/POS usan los diseños ya fijados.
