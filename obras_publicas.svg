@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180">
+<defs>
+  <filter id="s" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity=".25"/></filter>
+</defs>
+<path filter="url(#s)" d="M90 7c-39 0-71 31.7-71 70.8C19 128.4 90 174 90 174s71-45.6 71-96.2C161 38.7 129 7 90 7z"
+ fill="#436f92" stroke="#27485f" stroke-width="5"/>
+<circle cx="90" cy="76" r="53" fill="#fff" stroke="#d6e0e7" stroke-width="3"/>
+<path d="M48 95h84v28H48z" fill="#d9d4c5" stroke="#3e4c55" stroke-width="3"/>
+<path d="M45 94l45-26 45 26z" fill="#9b603d" stroke="#503728" stroke-width="3"/>
+<rect x="56" y="101" width="19" height="22" fill="#58656d"/>
+<rect x="105" y="101" width="19" height="22" fill="#58656d"/>
+<rect x="81" y="97" width="18" height="26" fill="#79513e"/>
+<rect x="64" y="80" width="52" height="12" rx="2" fill="#436f92"/>
+<text x="90" y="89" text-anchor="middle" font-family="Arial" font-size="10" font-weight="700" fill="white">OBRAS PÚBLICAS</text>
+<path d="M126 50l7-7 5 5-7 7 4 4-11 11-7-7 11-11z" fill="#59656d"/>
+</svg>
