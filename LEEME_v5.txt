@@ -1,0 +1,12 @@
+MAPA V5 · PROVINCIAS INE + ICONOS SVG
+
+Subir a la raíz de GitHub:
+1) mapa_v5_ine.html
+2) datos_patrimonio_caminero_v3.js
+
+IMPORTANTE:
+- datos_patrimonio_caminero_v3.js sustituye al archivo del mismo nombre que ya existe.
+- Los iconos van dibujados como SVG dentro del HTML: no dependen de PNG ni de carpetas.
+- El filtro de provincia usa Codigo_provincia_INE internamente.
+- En el desplegable se muestra: 15 · A Coruña, 27 · Lugo, etc.
+- Los registros sin provincia siguen visibles en "Todas" y tienen una opción específica.
