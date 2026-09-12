@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mapa del patrimonio caminero de España · v6 tipos corregidos</title>
+<meta name="description" content="Mapa interactivo de casillas de peones camineros, agrupaciones de viviendas, monumentos, casas de postas y edificios de Obras Públicas.">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+
+<style>
+:root{
+  --ink:#172033; --muted:#677181; --paper:#fff; --soft:#f6f2eb; --line:#e1e5e9;
+  --brand:#a95d2d; --brand-dark:#7e3f1b; --shadow:0 12px 32px rgba(20,31,48,.17);
+  --cpc:#c8642a; --avc:#a95d34; --mon:#3f9848; --pos:#c73737; --eop:#436f92;
+  --good:#2d8c50; --ruin:#dd8d28; --aband:#986d42; --gone:#cc3434; --trans:#7854a8; --unknown:#8a929c;
+}
+*{box-sizing:border-box}
+html,body,#app{width:100%;height:100%;margin:0}
+html,body{overflow:hidden;background:#dde4e9;color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer}
+a{text-decoration:none}
+#app{position:relative}
+#map{position:absolute;inset:0;background:#dfe6eb;z-index:1}
+
+.topbar{
+  position:absolute;z-index:1000;top:14px;left:14px;right:14px;
+  display:flex;gap:10px;align-items:center;pointer-events:none;
+}
+.brand,.search,.top-actions{pointer-events:auto}
+.brand{
+  width:286px;display:flex;align-items:center;gap:10px;
+  padding:9px 11px;background:rgba(255,255,255,.97);border:1px solid rgba(20,31,48,.08);
+  border-radius:15px;box-shadow:var(--shadow);
+}
+.brand-mark{
+  width:46px;height:46px;border-radius:12px;display:grid;place-items:center;
+  background:#fff2e5;color:var(--brand);font-size:25px;flex:0 0 auto
+}
+.brand-title{font-family:Georgia,"Times New Roman",serif;font-size:18px;font-weight:700;line-height:1.05}
+.brand-sub{font-size:11px;color:var(--muted);margin-top:3px}
+
+.search{
+  flex:1;max-width:760px;display:flex;background:rgba(255,255,255,.98);
+  border:1px solid rgba(20,31,48,.08);border-radius:15px;box-shadow:var(--shadow);overflow:hidden;
+}
+.search input{flex:1;min-width:0;border:0;outline:0;background:transparent;padding:15px 16px;font-size:15px}
+.search button{border:0;padding:0 20px;background:var(--brand);color:#fff;font-weight:800}
+.top-actions{margin-left:auto;display:flex;gap:8px}
+.top-btn{
+  height:48px;padding:0 14px;border:1px solid rgba(20,31,48,.08);border-radius:14px;
+  background:rgba(255,255,255,.98);box-shadow:var(--shadow);font-weight:800;color:var(--ink)
+}
+
+.sidebar{
+  position:absolute;z-index:850;top:82px;left:14px;bottom:14px;width:355px;
+  display:flex;flex-direction:column;overflow:hidden;background:rgba(255,255,255,.97);
+  border:1px solid rgba(20,31,48,.08);border-radius:17px;box-shadow:var(--shadow);
+}
+.sidebar-head{padding:14px 15px 11px;border-bottom:1px solid var(--line)}
+.total-line{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.total{font-family:Georgia,"Times New Roman",serif;font-size:24px;font-weight:700}
+.subtle{font-size:12px;color:var(--muted)}
+.mini-btn{border:0;background:transparent;font-size:20px;color:#667080}
+.category-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:11px}
+.cat-chip{
+  border:1px solid #dce1e6;background:#fff;border-radius:9px;padding:6px 3px;text-align:center;
+  min-width:0;cursor:pointer;transition:.15s
+}
+.cat-chip.off{opacity:.35;filter:grayscale(1)}
+.cat-chip .mini-svg{width:27px;height:31px;display:block;margin:0 auto 1px}.cat-chip .mini-svg svg{width:100%;height:100%;display:block}
+.cat-chip .mini-eop{
+  width:27px;height:27px;display:block;margin:0 auto 2px;background:none
+}
+.cat-chip b{display:block;font-size:10px}
+.cat-chip small{font-size:9px;color:var(--muted)}
+
+.results{flex:1;overflow:auto;overscroll-behavior:contain}
+.result{padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer;transition:.15s}
+.result:hover,.result.active{background:#fff3e8}
+.rtop{display:flex;gap:8px;align-items:flex-start}
+.ricon-svg{width:31px;height:36px;display:block;flex:0 0 auto}.ricon-svg svg{width:100%;height:100%;display:block}
+.rtext{min-width:0;flex:1}
+.rtitle{font-family:Georgia,"Times New Roman",serif;font-weight:700;font-size:15px;line-height:1.2}
+.rmeta{font-size:11.5px;line-height:1.45;color:#566170;margin-top:3px}
+.rbadges{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 6px;border-radius:999px;font-size:10px;font-weight:800;background:#f0f2f4;color:#4e5968}
+.badge.protected{background:#fff2c9;color:#755700;border:1px solid #e5c45a}
+.more{border:0;border-top:1px solid var(--line);padding:12px;background:#faf7f2;font-weight:800}
+.empty{padding:30px 20px;text-align:center;color:var(--muted)}
+
+.panel{
+  position:absolute;z-index:1100;top:82px;right:14px;width:350px;max-height:calc(100vh - 96px);
+  overflow:auto;background:rgba(255,255,255,.98);border:1px solid rgba(20,31,48,.08);
+  border-radius:17px;box-shadow:var(--shadow);padding:14px;display:none
+}
+.panel.open{display:block}
+.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.panel-head strong{font-family:Georgia,"Times New Roman",serif;font-size:20px}
+.close{border:0;background:transparent;font-size:23px;color:#657080}
+.section{margin:14px 0 7px;font-size:10.5px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#788291}
+.opt{display:flex;gap:9px;align-items:center;padding:8px;border-radius:9px}
+.opt:hover{background:#f4f6f8}
+.opt input{accent-color:var(--brand)}
+.opt small{display:block;color:var(--muted);margin-top:2px}
+.panel label.lbl{display:block;font-size:12px;font-weight:800;color:#4d5867;margin:10px 0 5px}
+.panel select{width:100%;padding:10px;border:1px solid #cfd5da;border-radius:9px;background:#fff}
+.check-grid{display:grid;gap:7px}
+.check-row{
+  display:flex;align-items:center;gap:9px;padding:7px 8px;border:1px solid #e3e6e9;border-radius:9px
+}
+.check-row img,.check-row .mini-eop{width:31px;height:31px;object-fit:contain;flex:0 0 auto}
+.check-row .mini-eop{background:none}
+.check-row .ctxt{flex:1;min-width:0}
+.check-row .ctxt b{display:block;font-size:12px}
+.check-row .ctxt small{color:var(--muted)}
+.filter-actions{display:flex;gap:8px;margin-top:14px}
+.filter-actions button{flex:1;border-radius:9px;padding:10px;font-weight:800}
+.primary{border:0;background:var(--brand);color:#fff}
+.secondary{border:1px solid #ccd2d8;background:#fff;color:var(--ink)}
+
+.card{
+  position:absolute;z-index:1050;right:14px;bottom:14px;width:385px;max-height:calc(100vh - 110px);
+  overflow:auto;background:#fff;border:1px solid rgba(20,31,48,.08);border-radius:18px;box-shadow:var(--shadow);display:none
+}
+.card.open{display:block}
+.card-head{
+  min-height:94px;display:flex;gap:12px;align-items:center;padding:14px 48px 13px 14px;
+  background:linear-gradient(135deg,#fff7ef,#f5efe5);position:relative;border-bottom:1px solid #eee4d8
+}
+.card-head img,.card-head .eop-big{width:72px;height:72px;object-fit:contain;flex:0 0 auto}
+.card-head .eop-big{background:none}
+.card-title{font-family:Georgia,"Times New Roman",serif;font-size:21px;line-height:1.08;font-weight:700}
+.card-type{font-size:11px;color:var(--muted);margin-top:5px}
+.card-close{
+  position:absolute;right:9px;top:9px;width:32px;height:32px;border-radius:50%;
+  border:0;background:rgba(255,255,255,.9);font-size:20px
+}
+.prot-banner{
+  display:none;padding:9px 14px;background:#fff3c8;border-bottom:1px solid #ead27a;
+  color:#6a5200;font-size:12px;font-weight:800
+}
+.prot-banner.show{display:block}
+.card-body{padding:14px}
+.grid{display:grid;grid-template-columns:105px 1fr;gap:7px 10px;font-size:12px}
+.grid b{color:#505b69}
+.desc{font-size:12px;line-height:1.5;color:#4f5967;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.card-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px}
+.card-actions a,.card-actions button{text-align:center;border-radius:9px;padding:10px;font-weight:800;font-size:12px}
+.street{background:var(--brand);color:#fff}
+.maps{background:#edf1f4;color:var(--ink)}
+.source{grid-column:1/-1;border:1px solid #d5dbe0;background:#fff;color:var(--ink)}
+
+.map-chip{
+  position:absolute;z-index:700;left:385px;bottom:17px;padding:7px 11px;background:rgba(255,255,255,.95);
+  border:1px solid rgba(20,31,48,.09);border-radius:999px;box-shadow:0 4px 13px rgba(20,31,48,.13);
+  font-size:11px;font-weight:800
+}
+
+.asset-marker{background:none!important;border:0!important}
+.asset-marker .wrap{position:relative;width:44px;height:47px}
+.asset-marker img,.asset-marker .eop{
+  width:42px;height:42px;object-fit:contain;display:block;filter:drop-shadow(0 2px 2px rgba(0,0,0,.28))
+}
+.asset-marker .eop{background:none}
+.asset-marker .shield{
+  position:absolute;right:-1px;top:-3px;width:17px;height:19px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.28))
+}
+.asset-marker .state-dot{
+  position:absolute;left:1px;bottom:3px;width:11px;height:11px;border-radius:50%;
+  border:2px solid white;box-shadow:0 1px 2px rgba(0,0,0,.35)
+}
+.asset-marker.selected .wrap{transform:scale(1.25);transform-origin:50% 90%}
+.marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{background:rgba(169,93,45,.23)!important}
+.marker-cluster div{background:var(--brand)!important;color:white!important;font-weight:800!important}
+
+.mobile-handle{display:none}
+.leaflet-control-zoom,.leaflet-control-scale{box-shadow:0 4px 14px rgba(20,31,48,.15)!important}
+
+@media(max-width:920px){
+  .brand{display:none}
+  .topbar{left:10px;right:10px;top:10px}
+  .search input{padding:13px 12px}
+  .search button{padding:0 14px}
+  .top-btn{height:44px;padding:0 11px}
+  .sidebar{
+    top:auto;left:10px;right:10px;bottom:10px;width:auto;height:41vh;
+    border-radius:17px 17px 12px 12px;transition:height .22s ease
+  }
+  .sidebar.collapsed{height:82px}
+  .mobile-handle{display:block;width:42px;height:5px;background:#c5cbd1;border-radius:999px;margin:8px auto 0}
+  .sidebar-head{padding-top:8px}
+  .category-strip{display:none}
+  .panel{top:64px;left:10px;right:10px;width:auto;max-height:64vh}
+  .card{left:10px;right:10px;bottom:10px;width:auto;max-height:58vh}
+  .map-chip{left:12px;bottom:calc(41vh + 18px)}
+}
+@media(max-width:560px){
+  .search button{font-size:0;width:48px}
+  .search button:after{content:"⌕";font-size:22px}
+  .top-actions{gap:6px}
+  .top-btn{font-size:0;padding:0;width:43px}
+  #filterBtn:after{content:"⚙";font-size:18px}
+  #layersBtn:after{content:"▱";font-size:20px}
+  .total{font-size:20px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="map"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">⌂</div>
+      <div>
+        <div class="brand-title">Patrimonio caminero</div>
+        <div class="brand-sub">Casillas de Peones Camineros de España · Provincias INE · v6</div>
+      </div>
+    </div>
+
+    <div class="search">
+      <input id="q" type="search" placeholder="Buscar casilla, carretera, municipio, monumento…" autocomplete="off">
+      <button id="searchBtn" type="button">Buscar</button>
+    </div>
+
+    <div class="top-actions">
+      <button id="filterBtn" class="top-btn" type="button">Filtros</button>
+      <button id="layersBtn" class="top-btn" type="button">Capas</button>
+    </div>
+  </header>
+
+  <aside id="sidebar" class="sidebar">
+    <div id="mobileHandle" class="mobile-handle"></div>
+    <div class="sidebar-head">
+      <div class="total-line">
+        <div>
+          <div class="total"><span id="totalCount">0</span> elementos</div>
+          <div id="countNote" class="subtle">Cargando base maestra…</div>
+        </div>
+        <button id="collapseBtn" class="mini-btn" type="button">‹</button>
+      </div>
+      <div id="categoryStrip" class="category-strip"></div>
+    </div>
+    <div id="results" class="results"></div>
+    <button id="moreBtn" class="more" type="button" style="display:none">Ver más</button>
+  </aside>
+
+  <section id="filterPanel" class="panel">
+    <div class="panel-head"><strong>Filtros</strong><button class="close" data-close="filterPanel">×</button></div>
+
+    <div class="section">Tipos de patrimonio</div>
+    <div id="categoryChecks" class="check-grid"></div>
+
+    <div class="section">Protección</div>
+    <label class="lbl" for="protectionFilter">Protección patrimonial</label>
+    <select id="protectionFilter">
+      <option value="">Todos</option>
+      <option value="protected">Solo patrimonio protegido</option>
+      <option value="unprotected">Sin protección conocida</option>
+    </select>
+
+    <label class="lbl" for="stateFilter">Estado de conservación</label>
+    <select id="stateFilter">
+      <option value="">Todos los estados</option>
+      <option>En pie</option>
+      <option>Ruinas</option>
+      <option>Abandonada</option>
+      <option>Transformada</option>
+      <option>Desaparecida / demolida</option>
+      <option>Otro / sin clasificar</option>
+      <option>Desconocido</option>
+    </select>
+
+    <label class="lbl" for="provinceFilter">Provincia</label>
+    <select id="provinceFilter"><option value="">Todas las provincias</option></select>
+
+    <div class="filter-actions">
+      <button id="applyFilters" class="primary">Aplicar</button>
+      <button id="clearFilters" class="secondary">Limpiar</button>
+    </div>
+  </section>
+
+  <section id="layersPanel" class="panel">
+    <div class="panel-head"><strong>Capas</strong><button class="close" data-close="layersPanel">×</button></div>
+    <div class="section">Mapa base</div>
+    <label class="opt"><input type="radio" name="base" value="ignBase" checked><span>IGN · Mapa base<small>Cartografía oficial</small></span></label>
+    <label class="opt"><input type="radio" name="base" value="osm"><span>OpenStreetMap</span></label>
+    <label class="opt"><input type="radio" name="base" value="ignRaster"><span>IGN · Mapa ráster</span></label>
+
+    <div class="section">Ortofotos</div>
+    <label class="opt"><input type="radio" name="base" value="pnoa"><span>PNOA · Actual</span></label>
+    <label class="opt"><input type="radio" name="base" value="americano"><span>Vuelo Americano · 1956–57</span></label>
+
+    <div class="section">Cartografía histórica</div>
+    <label class="opt"><input type="radio" name="base" value="primera"><span>MTN50 · Primera edición</span></label>
+    <label class="opt"><input type="radio" name="base" value="minutas"><span>Minutas MTN50</span></label>
+
+    <div class="section">Inventario</div>
+    <label class="opt"><input id="showMarkers" type="checkbox" checked><span>Iconos del inventario</span></label>
+    <label class="opt"><input id="showGeometries" type="checkbox" checked><span>Perímetros y recintos<small>Cuando el KML original los contiene</small></span></label>
+  </section>
+
+  <section id="card" class="card">
+    <div class="card-head">
+      <div id="cardIcon"></div>
+      <div>
+        <div id="cardTitle" class="card-title"></div>
+        <div id="cardType" class="card-type"></div>
+      </div>
+      <button id="cardClose" class="card-close">×</button>
+    </div>
+    <div id="protBanner" class="prot-banner">🛡 Patrimonio protegido</div>
+    <div class="card-body">
+      <div class="grid">
+        <b>Carretera</b><span id="cardRoad">—</span>
+        <b>PK</b><span id="cardPk">—</span>
+        <b>Municipio</b><span id="cardMunicipio">—</span>
+        <b>Provincia</b><span id="cardProvincia">—</span>
+        <b>Estado</b><span id="cardState">—</span>
+        <b>Subtipo</b><span id="cardSubtype">—</span>
+      </div>
+      <div id="protInfo" class="desc" style="display:none"></div>
+      <div id="cardDesc" class="desc"></div>
+      <div class="card-actions">
+        <a id="streetBtn" class="street" target="_blank" rel="noopener">Street View</a>
+        <a id="mapsBtn" class="maps" target="_blank" rel="noopener">Google Maps</a>
+        <a id="sourceBtn" class="source" target="_blank" rel="noopener" style="display:none">Documentación de protección</a>
+      </div>
+    </div>
+  </section>
+
+  <div id="mapChip" class="map-chip">IGN · Mapa base</div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="datos_patrimonio_caminero_v3.js?v=32"></script>
+
+<script>
+(function(){
+"use strict";
+
+const $ = id => document.getElementById(id);
+const data = window.PATRIMONIO_CAMINERO_GEOJSON;
+if(!window.L || !data || !Array.isArray(data.features)){
+  $("countNote").textContent = "No se pudo cargar Leaflet o la base de datos.";
+  return;
+}
+
+const CATEGORY = {
+  CPC:{label:"Casillas de peones", short:"Casillas", color:"#c8642a"},
+  AVC:{label:"Agrupaciones de viviendas", short:"Agrup.", color:"#a95d34"},
+  MON:{label:"Monumentos y esculturas", short:"Monum.", color:"#3f9848"},
+  POS:{label:"Casas de postas", short:"Postas", color:"#c73737"},
+  EOP:{label:"Edificios e instalaciones de O.P.", short:"O. P.", color:"#436f92"}
+};
+
+function svgIcon(code, extraClass=""){
+  const cls = extraClass ? ` class="${extraClass}"` : "";
+  const commonStart = `<svg${cls} viewBox="0 0 64 78" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">`;
+  const commonEnd = `</svg>`;
+
+  if(code==="CPC"){
+    return commonStart + `
+      <path d="M32 2C15.5 2 2 15.3 2 31.8C2 52.2 32 76 32 76s30-23.8 30-44.2C62 15.3 48.5 2 32 2z" fill="#c8642a" stroke="#733a1c" stroke-width="2"/>
+      <circle cx="32" cy="30" r="22.5" fill="#fffaf2" stroke="#ead8c5"/>
+      <rect x="14" y="31" width="36" height="17" rx="1" fill="#eee5d5" stroke="#554b42"/>
+      <path d="M11 31l21-11 21 11z" fill="#b8663e" stroke="#5f3422"/>
+      <rect x="16" y="18" width="5" height="12" fill="#f4efe5" stroke="#5f3422"/>
+      <rect x="43" y="18" width="5" height="12" fill="#f4efe5" stroke="#5f3422"/>
+      <rect x="28" y="35" width="8" height="13" fill="#78503a"/>
+      <rect x="18" y="36" width="6" height="7" fill="#3f484d"/>
+      <rect x="40" y="36" width="6" height="7" fill="#3f484d"/>
+      <rect x="23" y="29" width="18" height="5" rx="1" fill="#4d7593"/>
+      <text x="32" y="32.6" text-anchor="middle" font-size="3.3" font-family="Arial" font-weight="700" fill="white">PEONES CAMINEROS</text>
+    ` + commonEnd;
+  }
+
+  if(code==="AVC"){
+    return commonStart + `
+      <path d="M32 2C15.5 2 2 15.3 2 31.8C2 52.2 32 76 32 76s30-23.8 30-44.2C62 15.3 48.5 2 32 2z" fill="#a95d34" stroke="#6f361e" stroke-width="2"/>
+      <circle cx="32" cy="30" r="22.5" fill="#fffaf5" stroke="#ead8c8"/>
+      <path d="M11 31l7-6h28l7 6z" fill="#7e766e" stroke="#544a43"/>
+      <rect x="12" y="31" width="40" height="17" fill="#eee9df" stroke="#5a5149"/>
+      <g fill="#b7603d" stroke="#6e3825" stroke-width=".8">
+        <rect x="16" y="19" width="4" height="18"/><rect x="28" y="19" width="4" height="18"/><rect x="40" y="19" width="4" height="18"/><rect x="50" y="19" width="3" height="18"/>
+      </g>
+      <g fill="#7a5140">
+        <rect x="15" y="37" width="5" height="11"/><rect x="25" y="37" width="5" height="11"/><rect x="35" y="37" width="5" height="11"/><rect x="45" y="37" width="5" height="11"/>
+      </g>
+      <g fill="#474f55">
+        <rect x="21" y="35" width="3" height="5"/><rect x="31" y="35" width="3" height="5"/><rect x="41" y="35" width="3" height="5"/>
+      </g>
+      <path d="M13 35h38" stroke="#8a6b57" stroke-width="2"/>
+    ` + commonEnd;
+  }
+
+  if(code==="MON"){
+    return commonStart + `
+      <path d="M32 2C15.5 2 2 15.3 2 31.8C2 52.2 32 76 32 76s30-23.8 30-44.2C62 15.3 48.5 2 32 2z" fill="#3f9848" stroke="#23612b" stroke-width="2"/>
+      <circle cx="32" cy="30" r="22.5" fill="#fbfbf8" stroke="#d8e7d7"/>
+      <rect x="20" y="42" width="24" height="6" fill="#b8afa0" stroke="#5d5851"/>
+      <rect x="23" y="37" width="18" height="6" fill="#cfc7b8" stroke="#5d5851"/>
+      <rect x="26" y="33" width="12" height="5" fill="#d9d0c1" stroke="#5d5851"/>
+      <circle cx="32" cy="18" r="4" fill="#696b68"/>
+      <path d="M29 22c-3 5-2 10-1 14h8c1-5 2-10-1-14z" fill="#6f716f" stroke="#4a4c49"/>
+      <path d="M29 25l-5 8M35 25l5 7" stroke="#555856" stroke-width="2"/>
+      <path d="M30 36l-3 7M34 36l3 7" stroke="#555856" stroke-width="2"/>
+      <path d="M28 16c1-4 7-4 8 0" stroke="#4b4d4b" stroke-width="2"/>
+    ` + commonEnd;
+  }
+
+  if(code==="POS"){
+    return commonStart + `
+      <path d="M32 2C15.5 2 2 15.3 2 31.8C2 52.2 32 76 32 76s30-23.8 30-44.2C62 15.3 48.5 2 32 2z" fill="#c73737" stroke="#7b2020" stroke-width="2"/>
+      <circle cx="32" cy="30" r="22.5" fill="#fffaf6" stroke="#ecd0cc"/>
+      <rect x="12" y="27" width="40" height="22" fill="#f0e8dc" stroke="#655b51"/>
+      <path d="M10 27l22-9 22 9z" fill="#ad6945" stroke="#653a2a"/>
+      <rect x="29" y="14" width="6" height="11" fill="#eee7dd" stroke="#653a2a"/>
+      <rect x="18" y="31" width="6" height="6" fill="#4f575d"/><rect x="40" y="31" width="6" height="6" fill="#4f575d"/>
+      <rect x="18" y="40" width="6" height="7" fill="#4f575d"/><rect x="40" y="40" width="6" height="7" fill="#4f575d"/>
+      <path d="M28 49V39a4 4 0 018 0v10z" fill="#78513f" stroke="#5c3b2d"/>
+      <rect x="24" y="27" width="16" height="5" fill="#ece7df" stroke="#6a625a"/>
+      <text x="32" y="30.6" text-anchor="middle" font-size="3.7" font-family="Arial" font-weight="700" fill="#3b3734">CASA DE POSTAS</text>
+    ` + commonEnd;
+  }
+
+  return commonStart + `
+    <path d="M32 2C15.5 2 2 15.3 2 31.8C2 52.2 32 76 32 76s30-23.8 30-44.2C62 15.3 48.5 2 32 2z" fill="#436f92" stroke="#27485f" stroke-width="2"/>
+    <circle cx="32" cy="30" r="22.5" fill="#fafcff" stroke="#d5e1ea"/>
+    <rect x="12" y="31" width="40" height="17" fill="#dcd8cb" stroke="#4e5b64"/>
+    <path d="M10 31l22-11 22 11z" fill="#9b603d" stroke="#503728"/>
+    <rect x="17" y="36" width="8" height="12" fill="#59676f"/>
+    <rect x="39" y="36" width="8" height="12" fill="#59676f"/>
+    <rect x="28" y="34" width="8" height="14" fill="#79513e"/>
+    <rect x="20" y="27" width="24" height="5" rx="1" fill="#436f92"/>
+    <text x="32" y="30.7" text-anchor="middle" font-size="4" font-family="Arial" font-weight="700" fill="white">OBRAS PÚBLICAS</text>
+    <path d="M45 18l4-4 3 3-4 4 2 2-6 6-4-4 6-6z" fill="#59656d"/>
+  ` + commonEnd;
+}
+
+const COUNTS = {};
+Object.keys(CATEGORY).forEach(k=>COUNTS[k]=0);
+data.features.forEach(f=>{ const k=(f.properties||{}).Tipo_codigo; if(COUNTS[k]!=null) COUNTS[k]++; });
+
+const state = {
+  types:new Set(Object.keys(CATEGORY)),
+  protection:"",
+  state:"",
+  province:"",
+  query:"",
+  visible:100,
+  filtered:[],
+  activeBase:null,
+  selectedId:null
+};
+
+function esc(v){
+  return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+}
+function norm(v){
+  return String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+}
+function prop(f,k){ return (f.properties||{})[k]; }
+function idOf(f){ return prop(f,"ID") || f.id; }
+function categoryOf(f){ return prop(f,"Tipo_codigo") || "CPC"; }
+function isProtected(f){ return prop(f,"Protegido")==="SI" || prop(f,"Situacion_proteccion")==="Protegido"; }
+function stateColor(s){
+  if(s==="En pie") return "#2d8c50";
+  if(s==="Ruinas") return "#dd8d28";
+  if(s==="Abandonada") return "#986d42";
+  if(s==="Desaparecida / demolida") return "#cc3434";
+  if(s==="Transformada") return "#7854a8";
+  return "#8a929c";
+}
+function centerOf(f){
+  const lat=Number(prop(f,"Latitud")), lon=Number(prop(f,"Longitud"));
+  if(Number.isFinite(lat)&&Number.isFinite(lon)) return [lat,lon];
+  if(f.geometry && f.geometry.type==="Point") return [Number(f.geometry.coordinates[1]),Number(f.geometry.coordinates[0])];
+  return null;
+}
+function iconHTML(f, selected){
+  const c=categoryOf(f);
+  const inner = svgIcon(c,"asset-svg");
+  const shield = isProtected(f) ? `<svg class="shield" viewBox="0 0 24 28" aria-hidden="true"><path d="M12 1L22 5v7c0 7.2-4.5 11.8-10 15C6.5 23.8 2 19.2 2 12V5z" fill="#d5a51f" stroke="#fff" stroke-width="2"/><path d="M12 5v16" stroke="#fff" stroke-width="2" opacity=".7"/></svg>` : "";
+  return `<div class="wrap">${inner}${shield}<i class="state-dot" style="background:${stateColor(prop(f,"Estado_categoria"))}"></i></div>`;
+}
+function markerIcon(f, selected=false){
+  return L.divIcon({
+    className:"asset-marker"+(selected?" selected":""),
+    html:iconHTML(f,selected),
+    iconSize:[44,47],
+    iconAnchor:[22,43],
+    popupAnchor:[0,-41]
+  });
+}
+function listIcon(c){ return `<span class="ricon-svg">${svgIcon(c)}</span>`; }
+function cardIcon(c){ return `<span class="card-svg">${svgIcon(c)}</span>`; }
+
+const map=L.map("map",{zoomControl:true,preferCanvas:true,minZoom:2});
+const baseLayers={
+  osm:L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"&copy; OpenStreetMap contributors"}),
+  ignBase:L.tileLayer("https://www.ign.es/wmts/ign-base?service=WMTS&request=GetTile&version=1.0.0&layer=IGNBaseTodo&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{maxZoom:20,attribution:"&copy; IGN"}),
+  ignRaster:L.tileLayer("https://www.ign.es/wmts/mapa-raster?service=WMTS&request=GetTile&version=1.0.0&layer=MTN&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{maxZoom:20,attribution:"&copy; IGN"}),
+  pnoa:L.tileLayer("https://www.ign.es/wmts/pnoa-ma?service=WMTS&request=GetTile&version=1.0.0&layer=OI.OrthoimageCoverage&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{maxZoom:20,attribution:"PNOA &copy; IGN-CNIG"}),
+  americano:L.tileLayer.wms("https://www.ign.es/wms/pnoa-historico",{layers:"AMS_1956-1957",format:"image/jpeg",transparent:false,version:"1.3.0",attribution:"Vuelo Americano 1956-1957 · IGN"}),
+  primera:L.tileLayer("https://www.ign.es/wmts/primera-edicion-mtn?service=WMTS&request=GetTile&version=1.0.0&layer=mtn50-edicion1&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{maxZoom:18,attribution:"Primera edición MTN50 · IGN"}),
+  minutas:L.tileLayer("https://www.ign.es/wmts/primera-edicion-mtn?service=WMTS&request=GetTile&version=1.0.0&layer=catastrones&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{maxZoom:18,attribution:"Minutas MTN50 · IGN"})
+};
+function setBase(name){
+  if(state.activeBase) map.removeLayer(state.activeBase);
+  state.activeBase=baseLayers[name]||baseLayers.ignBase;
+  state.activeBase.addTo(map);
+  const names={ignBase:"IGN · Mapa base",osm:"OpenStreetMap",ignRaster:"IGN · Mapa ráster",pnoa:"PNOA · Actual",americano:"Vuelo Americano · 1956–57",primera:"MTN50 · Primera edición",minutas:"Minutas MTN50"};
+  $("mapChip").textContent=names[name]||"Mapa";
+}
+setBase("ignBase");
+
+const cluster=L.markerClusterGroup({
+  chunkedLoading:true,chunkInterval:120,chunkDelay:20,maxClusterRadius:48,
+  showCoverageOnHover:false,spiderfyOnMaxZoom:true,removeOutsideVisibleBounds:true
+}).addTo(map);
+const geometries=L.layerGroup().addTo(map);
+let selectedGeometry=null;
+const markerById=new Map();
+const featureById=new Map(data.features.map(f=>[String(idOf(f)),f]));
+
+function geometryStyle(f, selected=false){
+  const c=CATEGORY[categoryOf(f)]||CATEGORY.CPC;
+  return {color:c.color,weight:selected?5:2,opacity:selected?1:.78,fillColor:c.color,fillOpacity:selected?.20:.08};
+}
+function addGeometry(f){
+  if(!f.geometry || f.geometry.type==="Point") return;
+  const layer=L.geoJSON(f.geometry,{style:geometryStyle(f,false)});
+  layer.on("click",()=>selectFeature(f));
+  geometries.addLayer(layer);
+}
+
+function makeMarker(f){
+  const center=centerOf(f);
+  if(!center) return null;
+  const m=L.marker(center,{icon:markerIcon(f,false),title:prop(f,"Nombre")||""});
+  m.on("click",()=>selectFeature(f));
+  markerById.set(String(idOf(f)),m);
+  return m;
+}
+
+function renderMap(features,fit){
+  cluster.clearLayers(); geometries.clearLayers(); markerById.clear();
+  const markers=[], bounds=[];
+  features.forEach(f=>{
+    const m=makeMarker(f);
+    if(m){ markers.push(m); bounds.push(m.getLatLng()); }
+    addGeometry(f);
+  });
+  cluster.addLayers(markers);
+  if(!$("showMarkers").checked && map.hasLayer(cluster)) map.removeLayer(cluster);
+  else if($("showMarkers").checked && !map.hasLayer(cluster)) map.addLayer(cluster);
+  if(!$("showGeometries").checked && map.hasLayer(geometries)) map.removeLayer(geometries);
+  else if($("showGeometries").checked && !map.hasLayer(geometries)) map.addLayer(geometries);
+
+  if(fit && bounds.length){
+    if(features.length===data.features.length) map.fitBounds([[27.3,-18.7],[44.4,4.8]],{padding:[25,25]});
+    else map.fitBounds(L.latLngBounds(bounds),{padding:[45,45],maxZoom:12});
+  }
+}
+
+function renderCategoryUI(){
+  const strip=$("categoryStrip"), checks=$("categoryChecks");
+  strip.innerHTML=""; checks.innerHTML="";
+  Object.entries(CATEGORY).forEach(([code,c])=>{
+    const icon=`<span class="mini-svg">${svgIcon(code)}</span>`;
+    const chip=document.createElement("div");
+    chip.className="cat-chip"+(state.types.has(code)?"":" off");
+    chip.dataset.code=code;
+    chip.innerHTML=`${icon}<b>${esc(c.short)}</b><small>${COUNTS[code].toLocaleString("es-ES")}</small>`;
+    chip.onclick=()=>{
+      const onlyThis = state.types.size===1 && state.types.has(code);
+
+      // Los botones superiores son accesos rápidos:
+      // 1 clic = mostrar solamente este tipo y limpiar filtros secundarios.
+      // 2º clic sobre el mismo tipo = volver a mostrar todos los tipos.
+      if(onlyThis){
+        state.types=new Set(Object.keys(CATEGORY));
+        history.replaceState(null,"",location.pathname);
+      }else{
+        state.types=new Set([code]);
+        history.replaceState(null,"",`?tipo=${encodeURIComponent(code)}`);
+      }
+
+      // Evita que un filtro anterior deje una categoría en 0 resultados.
+      state.query="";
+      state.protection="";
+      state.state="";
+      state.province="";
+      $("q").value="";
+      $("protectionFilter").value="";
+      $("stateFilter").value="";
+      $("provinceFilter").value="";
+
+      renderCategoryUI();
+      applyFilters(true);
+    };
+    strip.appendChild(chip);
+
+    const row=document.createElement("label");
+    row.className="check-row";
+    row.innerHTML=`<input type="checkbox" data-cat="${code}" ${state.types.has(code)?"checked":""}>${icon}<span class="ctxt"><b>${esc(c.label)}</b><small>${COUNTS[code].toLocaleString("es-ES")} registros</small></span>`;
+    const cb=row.querySelector("input");
+    cb.onchange=()=>{ if(cb.checked)state.types.add(code); else state.types.delete(code); renderCategoryUI(); };
+    checks.appendChild(row);
+  });
+}
+
+function buildProvinceFilter(){
+  const byCode=new Map();
+  let withoutProvince=0;
+
+  data.features.forEach(f=>{
+    const p=f.properties||{};
+    const code=String(p.Codigo_provincia_INE||"").trim();
+    const name=String(p.Provincia_Distrito||"").trim();
+    if(code && name) byCode.set(code,name);
+    else withoutProvince++;
+  });
+
+  [...byCode.entries()]
+    .sort((a,b)=>Number(a[0])-Number(b[0]))
+    .forEach(([code,name])=>{
+      const o=document.createElement("option");
+      o.value=code;
+      o.textContent=`${code} · ${name}`;
+      $("provinceFilter").appendChild(o);
+    });
+
+  if(withoutProvince){
+    const o=document.createElement("option");
+    o.value="__SIN__";
+    o.textContent=`— Sin provincia identificada (${withoutProvince})`;
+    $("provinceFilter").appendChild(o);
+  }
+}
+
+function matches(f){
+  const p=f.properties||{};
+  if(!state.types.has(categoryOf(f))) return false;
+  if(state.protection==="protected" && !isProtected(f)) return false;
+  if(state.protection==="unprotected" && isProtected(f)) return false;
+  if(state.state && p.Estado_categoria!==state.state) return false;
+  if(state.province==="__SIN__" && String(p.Codigo_provincia_INE||"").trim()) return false;
+  if(state.province && state.province!=="__SIN__" && String(p.Codigo_provincia_INE||"").trim()!==state.province) return false;
+  if(state.query){
+    const hay=norm([
+      p.ID,p.Nombre,p.Nombre_alternativo,p.Tipo,p.Subtipo,p.Carretera_actual,p.Carretera_historica,
+      p.PK,p.Municipio_Concelho,p.Codigo_provincia_INE,p.Provincia_INE,p.Provincia_Distrito,p.Provincia_original,p.Localidad,p.Descripcion,p.Figura_proteccion
+    ].filter(Boolean).join(" "));
+    if(!hay.includes(state.query)) return false;
+  }
+  return true;
+}
+
+function applyFilters(fit=false){
+  state.query=norm($("q").value.trim());
+  state.protection=$("protectionFilter").value;
+  state.state=$("stateFilter").value;
+  state.province=$("provinceFilter").value;
+  state.filtered=data.features.filter(matches);
+  state.visible=100;
+  state.selectedId=null;
+  $("card").classList.remove("open");
+  renderMap(state.filtered,fit);
+  renderResults();
+  $("filterPanel").classList.remove("open");
+}
+
+function clearFilters(){
+  state.types=new Set(Object.keys(CATEGORY));
+  state.protection=state.state=state.province=state.query="";
+  $("q").value=""; $("protectionFilter").value=""; $("stateFilter").value=""; $("provinceFilter").value="";
+  history.replaceState(null,"",location.pathname);
+  renderCategoryUI();
+  applyFilters(true);
+}
+
+function renderResults(){
+  $("totalCount").textContent=state.filtered.length.toLocaleString("es-ES");
+  const protectedN=state.filtered.filter(isProtected).length;
+  $("countNote").textContent=`${protectedN.toLocaleString("es-ES")} con protección registrada`;
+
+  const box=$("results"); box.innerHTML="";
+  const n=Math.min(state.visible,state.filtered.length);
+  if(!n){ box.innerHTML='<div class="empty">No hay resultados con estos filtros.</div>'; $("moreBtn").style.display="none"; return; }
+
+  for(let i=0;i<n;i++){
+    const f=state.filtered[i], p=f.properties||{}, c=categoryOf(f);
+    const row=document.createElement("div");
+    row.className="result"+(String(idOf(f))===String(state.selectedId)?" active":"");
+    row.innerHTML=`<div class="rtop">${listIcon(c)}<div class="rtext">
+      <div class="rtitle">${esc(p.Nombre||CATEGORY[c].label)}</div>
+      <div class="rmeta">${esc([p.Carretera_actual,p.PK?("PK "+p.PK):""].filter(Boolean).join(" · "))}${(p.Carretera_actual||p.PK)&&(p.Municipio_Concelho||p.Provincia_Distrito)?"<br>":""}${esc([p.Municipio_Concelho,p.Provincia_Distrito].filter(Boolean).join(" · "))}</div>
+      <div class="rbadges"><span class="badge" style="border-left:4px solid ${CATEGORY[c].color}">${esc(CATEGORY[c].short)}</span>${isProtected(f)?'<span class="badge protected">🛡 Protegido</span>':""}</div>
+    </div></div>`;
+    row.onclick=()=>selectFeature(f,true);
+    box.appendChild(row);
+  }
+
+  if(n<state.filtered.length){
+    $("moreBtn").style.display="block";
+    $("moreBtn").textContent=`Ver más (${(state.filtered.length-n).toLocaleString("es-ES")})`;
+  }else $("moreBtn").style.display="none";
+}
+
+function selectFeature(f,zoom=true){
+  const id=String(idOf(f)); state.selectedId=id;
+  const p=f.properties||{}, c=categoryOf(f), m=markerById.get(id);
+
+  document.querySelectorAll(".result.active").forEach(x=>x.classList.remove("active"));
+  renderResults();
+
+  $("cardIcon").innerHTML=cardIcon(c);
+  $("cardTitle").textContent=p.Nombre||CATEGORY[c].label;
+  $("cardType").textContent=`${CATEGORY[c].label} · ${p.ID||id}`;
+  $("cardRoad").textContent=p.Carretera_actual||p.Carretera_historica||"—";
+  $("cardPk").textContent=p.PK||"—";
+  $("cardMunicipio").textContent=p.Municipio_Concelho||p.Localidad||"—";
+  $("cardProvincia").textContent=p.Provincia_Distrito ? `${p.Codigo_provincia_INE||""}${p.Codigo_provincia_INE?" · ":""}${p.Provincia_Distrito}` : "—";
+  $("cardState").textContent=p.Estado_actual||p.Estado_categoria||"—";
+  $("cardSubtype").textContent=p.Subtipo||"—";
+  const desc=String(p.Descripcion||"").trim();
+  $("cardDesc").textContent=desc ? (desc.length>700?desc.slice(0,700)+"…":desc) : "Sin descripción adicional.";
+
+  $("protBanner").classList.toggle("show",isProtected(f));
+  const protBits=[
+    p.Figura_proteccion ? `<b>Protección:</b> ${esc(p.Figura_proteccion)}` : "",
+    p.Catalogo_registro ? `<b>Catálogo / plan:</b> ${esc(p.Catalogo_registro)}` : "",
+    p.Fecha_proteccion ? `<b>Fecha:</b> ${esc(p.Fecha_proteccion)}` : "",
+    p.Observaciones_proteccion ? esc(p.Observaciones_proteccion) : ""
+  ].filter(Boolean);
+  $("protInfo").style.display=isProtected(f)?"block":"none";
+  $("protInfo").innerHTML=protBits.join("<br>");
+
+  $("streetBtn").href=p.Street_View||"#";
+  $("mapsBtn").href=p.Google_Maps||"#";
+  if(p.URL_proteccion){
+    $("sourceBtn").href=p.URL_proteccion; $("sourceBtn").style.display="block";
+  } else $("sourceBtn").style.display="none";
+  $("card").classList.add("open");
+
+  if(selectedGeometry){ map.removeLayer(selectedGeometry); selectedGeometry=null; }
+  if(f.geometry && f.geometry.type!=="Point"){
+    selectedGeometry=L.geoJSON(f.geometry,{style:geometryStyle(f,true)}).addTo(map);
+    selectedGeometry.bringToFront();
+  }
+
+  if(m){
+    m.setIcon(markerIcon(f,true));
+    markerById.forEach((mk,mid)=>{if(mid!==id){ const ff=featureById.get(mid); if(ff)mk.setIcon(markerIcon(ff,false)); }});
+    if(zoom){
+      cluster.zoomToShowLayer(m,()=>{
+        map.setView(m.getLatLng(),Math.max(map.getZoom(),14));
+      });
+    } else map.panTo(m.getLatLng());
+  }
+
+  history.replaceState(null,"",`?id=${encodeURIComponent(id)}`);
+  if(window.innerWidth<=920) $("sidebar").classList.add("collapsed");
+}
+
+function loadQueryParams(){
+  const params=new URLSearchParams(location.search);
+  const tipo=params.get("tipo");
+  if(tipo && CATEGORY[tipo]){
+    state.types=new Set([tipo]);
+    renderCategoryUI();
+  }
+  const id=params.get("id");
+  applyFilters(false);
+  map.fitBounds([[27.3,-18.7],[44.4,4.8]],{padding:[25,25]});
+  if(id && featureById.has(id)){
+    const f=featureById.get(id);
+    if(!state.types.has(categoryOf(f))){ state.types.add(categoryOf(f)); renderCategoryUI(); applyFilters(false); }
+    setTimeout(()=>selectFeature(f,true),500);
+  }
+}
+
+$("searchBtn").onclick=()=>applyFilters(true);
+$("q").addEventListener("keydown",e=>{if(e.key==="Enter")applyFilters(true)});
+$("applyFilters").onclick=()=>{ document.querySelectorAll("#categoryChecks input[data-cat]").forEach(cb=>{ if(cb.checked)state.types.add(cb.dataset.cat); else state.types.delete(cb.dataset.cat); }); applyFilters(true); };
+$("clearFilters").onclick=clearFilters;
+$("moreBtn").onclick=()=>{state.visible+=100;renderResults()};
+
+$("filterBtn").onclick=()=>{ $("layersPanel").classList.remove("open"); $("filterPanel").classList.toggle("open"); };
+$("layersBtn").onclick=()=>{ $("filterPanel").classList.remove("open"); $("layersPanel").classList.toggle("open"); };
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove("open"));
+
+document.querySelectorAll('input[name="base"]').forEach(r=>r.onchange=()=>{if(r.checked)setBase(r.value)});
+$("showMarkers").onchange=function(){ if(this.checked){if(!map.hasLayer(cluster))map.addLayer(cluster)}else if(map.hasLayer(cluster))map.removeLayer(cluster) };
+$("showGeometries").onchange=function(){ if(this.checked){if(!map.hasLayer(geometries))map.addLayer(geometries)}else if(map.hasLayer(geometries))map.removeLayer(geometries) };
+
+$("cardClose").onclick=()=>{ $("card").classList.remove("open"); if(selectedGeometry){map.removeLayer(selectedGeometry);selectedGeometry=null;} };
+function toggleSheet(){ if(window.innerWidth<=920)$("sidebar").classList.toggle("collapsed"); }
+$("mobileHandle").onclick=toggleSheet; $("collapseBtn").onclick=toggleSheet;
+window.addEventListener("resize",()=>setTimeout(()=>map.invalidateSize(),100));
+
+buildProvinceFilter();
+
+// Firefox y otros navegadores pueden recordar valores de los <select> al recargar.
+// La portada del mapa siempre arranca sin filtros secundarios.
+$("q").value="";
+$("protectionFilter").value="";
+$("stateFilter").value="";
+$("provinceFilter").value="";
+state.query="";
+state.protection="";
+state.state="";
+state.province="";
+
+renderCategoryUI();
+loadQueryParams();
+setTimeout(()=>map.invalidateSize(),250);
+})();
+</script>
+</body>
+</html>
+
+<style>
+.check-row .mini-svg{width:31px;height:36px;display:block;flex:0 0 auto}
+.check-row .mini-svg svg{width:100%;height:100%;display:block}
+.card-head .card-svg{width:72px;height:78px;display:block;flex:0 0 auto}
+.card-head .card-svg svg{width:100%;height:100%;display:block}
+.asset-marker .asset-svg{width:42px;height:48px;display:block;filter:drop-shadow(0 2px 2px rgba(0,0,0,.28))}
+</style>

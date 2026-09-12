@@ -1,0 +1,19 @@
+MAPA V6 · TIPOS CORREGIDOS + PROVINCIAS INE + ICONOS SVG
+
+Corrección principal:
+- Los botones superiores Casillas / Agrup. / Monum. / Postas / O.P. actúan ahora como accesos rápidos.
+- Al pulsar un tipo se muestra solamente ese tipo.
+- Se limpian automáticamente búsqueda, provincia, estado y protección para evitar falsos "0 resultados".
+- Al pulsar de nuevo el mismo tipo se vuelve a mostrar todo.
+- Los filtros avanzados siguen disponibles en el botón Filtros.
+
+Datos verificados:
+CPC 2266
+AVC 57
+MON 8
+POS 3
+EOP 37
+TOTAL 2371
+
+Los iconos son SVG internos al HTML.
+El filtro de provincia usa Codigo_provincia_INE.
