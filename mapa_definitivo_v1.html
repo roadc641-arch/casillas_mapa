@@ -1,0 +1,994 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mapa de Casillas de Peones Camineros</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+
+<style>
+:root{
+  --ink:#172033;
+  --muted:#697181;
+  --paper:#ffffff;
+  --line:#e3e5e9;
+  --soft:#f5f1e9;
+  --brand:#ad601e;
+  --brand2:#c97529;
+  --shadow:0 10px 30px rgba(19,32,51,.16);
+  --green:#26884f;
+  --ruin:#d48a23;
+  --aband:#956e45;
+  --gone:#c73535;
+  --other:#777;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#eef1f4;color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer}
+a{text-decoration:none}
+
+#app{
+  width:100vw;
+  height:100vh;
+  position:relative;
+  overflow:hidden;
+  background:#dfe6ec;
+}
+
+#map{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  background:#dde3e8;
+}
+
+.topbar{
+  position:absolute;
+  z-index:900;
+  top:14px;
+  left:14px;
+  right:14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  pointer-events:none;
+}
+
+.brand{
+  pointer-events:auto;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:rgba(255,255,255,.97);
+  border:1px solid rgba(23,32,51,.08);
+  box-shadow:var(--shadow);
+  border-radius:14px;
+  padding:9px 12px;
+  min-width:280px;
+}
+
+.brandIcon{
+  width:46px;
+  height:46px;
+  border-radius:12px;
+  background:#fff4e9;
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+}
+
+.brandIcon svg{width:38px;height:38px}
+.brandTitle{font-family:Georgia,"Times New Roman",serif;font-size:18px;font-weight:700;line-height:1.05}
+.brandSub{font-size:11px;color:var(--muted);margin-top:3px}
+
+.searchWrap{
+  pointer-events:auto;
+  flex:1;
+  max-width:760px;
+  display:flex;
+  align-items:center;
+  background:rgba(255,255,255,.98);
+  border:1px solid rgba(23,32,51,.08);
+  box-shadow:var(--shadow);
+  border-radius:14px;
+  overflow:hidden;
+}
+
+.searchWrap input{
+  flex:1;
+  min-width:0;
+  border:0;
+  outline:0;
+  padding:15px 16px;
+  font-size:15px;
+  background:transparent;
+}
+
+.searchBtn{
+  border:0;
+  color:#fff;
+  background:var(--brand);
+  padding:15px 20px;
+  font-weight:700;
+}
+
+.topButtons{
+  pointer-events:auto;
+  display:flex;
+  gap:8px;
+  margin-left:auto;
+}
+
+.iconBtn{
+  height:48px;
+  padding:0 14px;
+  border:1px solid rgba(23,32,51,.08);
+  border-radius:14px;
+  background:rgba(255,255,255,.98);
+  color:var(--ink);
+  box-shadow:var(--shadow);
+  font-weight:700;
+}
+
+.sidebar{
+  position:absolute;
+  z-index:850;
+  top:82px;
+  left:14px;
+  bottom:14px;
+  width:340px;
+  border-radius:16px;
+  background:rgba(255,255,255,.97);
+  border:1px solid rgba(23,32,51,.08);
+  box-shadow:var(--shadow);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+.sidebarHead{
+  padding:15px 16px 12px;
+  border-bottom:1px solid var(--line);
+}
+
+.countLine{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.countBig{
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:24px;
+  font-weight:700;
+}
+
+.miniMuted{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.legend{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px 12px;
+  margin-top:12px;
+  font-size:12px;
+}
+.legend span{display:flex;align-items:center;gap:6px}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+
+.results{
+  flex:1;
+  overflow:auto;
+  overscroll-behavior:contain;
+}
+
+.result{
+  padding:13px 15px;
+  border-bottom:1px solid var(--line);
+  cursor:pointer;
+  transition:.15s ease;
+}
+.result:hover{background:#faf7f2}
+.result.active{background:#fff4e9}
+.resultTitle{
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:16px;
+  font-weight:700;
+  line-height:1.2;
+  margin-bottom:4px;
+}
+.resultMeta{font-size:12px;color:#505968;line-height:1.4}
+.resultState{font-size:12px;font-weight:700;margin-top:5px}
+
+.moreBtn{
+  width:100%;
+  border:0;
+  border-top:1px solid var(--line);
+  padding:12px;
+  background:#faf7f2;
+  font-weight:700;
+}
+
+.layersPanel,.filterPanel{
+  position:absolute;
+  z-index:920;
+  top:82px;
+  right:14px;
+  width:330px;
+  max-height:calc(100vh - 96px);
+  overflow:auto;
+  background:rgba(255,255,255,.98);
+  border:1px solid rgba(23,32,51,.08);
+  border-radius:16px;
+  box-shadow:var(--shadow);
+  padding:14px;
+  display:none;
+}
+
+.layersPanel.open,.filterPanel.open{display:block}
+
+.panelHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+.panelHead strong{font-family:Georgia,"Times New Roman",serif;font-size:20px}
+.closeBtn{
+  border:0;
+  background:transparent;
+  font-size:22px;
+  line-height:1;
+  color:#596273;
+}
+
+.sectionTitle{
+  margin:14px 0 8px;
+  font-size:11px;
+  font-weight:800;
+  color:#7a8493;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+
+.layerOption{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:9px 8px;
+  border-radius:8px;
+  cursor:pointer;
+}
+.layerOption:hover{background:#f5f7f9}
+.layerOption input{accent-color:var(--brand)}
+.layerOption small{display:block;color:var(--muted);margin-top:2px}
+
+.filterPanel label{
+  display:block;
+  margin:10px 0 5px;
+  font-size:12px;
+  font-weight:700;
+  color:#515b6a;
+}
+.filterPanel select{
+  width:100%;
+  padding:10px;
+  border:1px solid #cfd4da;
+  border-radius:8px;
+  background:#fff;
+}
+
+.filterActions{
+  display:flex;
+  gap:8px;
+  margin-top:14px;
+}
+.filterActions button{
+  flex:1;
+  padding:10px;
+  border-radius:8px;
+  font-weight:700;
+}
+.primary{border:0;background:var(--brand);color:#fff}
+.secondary{border:1px solid #c9ced5;background:#fff;color:var(--ink)}
+
+.infoCard{
+  position:absolute;
+  z-index:930;
+  right:14px;
+  bottom:14px;
+  width:360px;
+  max-height:calc(100vh - 110px);
+  overflow:auto;
+  background:#fff;
+  border:1px solid rgba(23,32,51,.08);
+  border-radius:16px;
+  box-shadow:var(--shadow);
+  display:none;
+}
+.infoCard.open{display:block}
+
+.cardHero{
+  height:120px;
+  background:linear-gradient(135deg,#f4e3cf,#f8f5ef);
+  position:relative;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+}
+.cardHero svg{width:190px;height:105px;opacity:.98}
+.cardClose{
+  position:absolute;
+  top:8px;
+  right:8px;
+  width:34px;
+  height:34px;
+  border:0;
+  border-radius:50%;
+  background:rgba(255,255,255,.92);
+  font-size:20px;
+}
+.cardBody{padding:14px 15px 16px}
+.cardBody h2{
+  margin:0 0 8px;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:22px;
+  line-height:1.1;
+}
+.dataGrid{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:6px 10px;
+  font-size:13px;
+}
+.dataGrid b{color:#4a5361}
+.cardState{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  margin:10px 0 2px;
+  padding:6px 9px;
+  border-radius:999px;
+  background:#f4f6f8;
+  font-weight:700;
+  font-size:12px;
+}
+.cardButtons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:12px;
+}
+.cardButtons a,.cardButtons button{
+  text-align:center;
+  padding:10px;
+  border-radius:8px;
+  font-weight:700;
+  font-size:12px;
+}
+.btnStreet{background:var(--brand);color:#fff}
+.btnMaps{background:#eef1f4;color:var(--ink)}
+.btnCompare{grid-column:1 / -1;border:1px solid #d8dde3;background:#fff;color:var(--ink)}
+
+.statusChip{
+  position:absolute;
+  z-index:700;
+  left:370px;
+  bottom:18px;
+  background:rgba(255,255,255,.94);
+  border:1px solid rgba(23,32,51,.08);
+  border-radius:999px;
+  box-shadow:0 3px 12px rgba(19,32,51,.12);
+  padding:7px 10px;
+  font-size:11px;
+  font-weight:700;
+}
+
+.leaflet-control-zoom,.leaflet-control-layers,.leaflet-control-scale{box-shadow:0 4px 14px rgba(19,32,51,.14)!important}
+.leaflet-control-layers{display:none!important}
+.leaflet-popup-content-wrapper{border-radius:12px}
+.leaflet-popup-content{margin:10px 12px}
+
+.cpPin{
+  background:none!important;
+  border:0!important;
+}
+
+.marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{
+  background:rgba(173,96,30,.20)!important;
+}
+.marker-cluster div{
+  background:var(--brand)!important;
+  color:#fff!important;
+  font-weight:700!important;
+}
+
+.mobileSheetHandle{display:none}
+
+@media(max-width:900px){
+  .brand{display:none}
+  .topbar{left:10px;right:10px;top:10px}
+  .searchWrap input{padding:13px 12px}
+  .searchBtn{padding:13px 14px}
+  .iconBtn{height:44px;padding:0 11px}
+  .sidebar{
+    top:auto;
+    left:10px;
+    right:10px;
+    bottom:10px;
+    width:auto;
+    height:38vh;
+    border-radius:16px 16px 12px 12px;
+    transition:transform .25s ease,height .25s ease;
+  }
+  .sidebar.collapsed{height:76px}
+  .mobileSheetHandle{
+    display:block;
+    width:42px;
+    height:5px;
+    background:#c6ccd3;
+    border-radius:999px;
+    margin:8px auto 0;
+    cursor:pointer;
+  }
+  .sidebarHead{padding-top:8px}
+  .legend{display:none}
+  .results{max-height:none}
+  .layersPanel,.filterPanel{
+    top:64px;
+    left:10px;
+    right:10px;
+    width:auto;
+    max-height:62vh;
+  }
+  .infoCard{
+    left:10px;
+    right:10px;
+    bottom:10px;
+    width:auto;
+    max-height:56vh;
+  }
+  .statusChip{
+    left:12px;
+    bottom:calc(38vh + 18px);
+  }
+  .sidebar.collapsed ~ .statusChip{bottom:94px}
+}
+
+@media(max-width:560px){
+  .searchBtn{font-size:0;width:48px;padding:0}
+  .searchBtn:after{content:"⌕";font-size:22px}
+  .topButtons{gap:6px}
+  .iconBtn{padding:0 10px;font-size:0}
+  #filterBtn:after{content:"⚙";font-size:18px}
+  #layersBtn:after{content:"▱";font-size:20px}
+  .countBig{font-size:20px}
+  .sidebar{height:42vh}
+  .statusChip{bottom:calc(42vh + 18px)}
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+  <div id="map"></div>
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brandIcon" aria-hidden="true">
+        <svg viewBox="0 0 60 48">
+          <rect x="7" y="21" width="46" height="21" rx="2" fill="#c8b89a" stroke="#6d6252"/>
+          <path d="M4 22 L30 8 L56 22 Z" fill="#bd6c3b" stroke="#78452f"/>
+          <rect x="15" y="8" width="6" height="12" fill="#ad5b31"/>
+          <rect x="39" y="8" width="6" height="12" fill="#ad5b31"/>
+          <rect x="26" y="25" width="8" height="17" fill="#79513e"/>
+          <rect x="12" y="27" width="8" height="9" fill="#38444b"/>
+          <rect x="40" y="27" width="8" height="9" fill="#38444b"/>
+          <rect x="22" y="20" width="16" height="5" rx="1" fill="#346c94"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brandTitle">Casillas de Peones Camineros</div>
+        <div class="brandSub">Inventario, historia y localización</div>
+      </div>
+    </div>
+
+    <div class="searchWrap">
+      <input id="searchInput" type="search" autocomplete="off" placeholder="Buscar casilla, carretera, municipio o provincia…">
+      <button id="searchBtn" class="searchBtn" type="button">Buscar</button>
+    </div>
+
+    <div class="topButtons">
+      <button id="filterBtn" class="iconBtn" type="button">Filtros</button>
+      <button id="layersBtn" class="iconBtn" type="button">Capas</button>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div id="sheetHandle" class="mobileSheetHandle" title="Abrir/cerrar resultados"></div>
+    <div class="sidebarHead">
+      <div class="countLine">
+        <div>
+          <div class="countBig"><span id="count">0</span> casillas</div>
+          <div id="countInfo" class="miniMuted">Cargando inventario…</div>
+        </div>
+        <button id="collapseBtn" class="closeBtn" type="button" title="Ocultar resultados">‹</button>
+      </div>
+
+      <div class="legend">
+        <span><i class="dot" style="background:var(--green)"></i>En pie</span>
+        <span><i class="dot" style="background:var(--ruin)"></i>Ruinas</span>
+        <span><i class="dot" style="background:var(--aband)"></i>Abandonada</span>
+        <span><i class="dot" style="background:var(--gone)"></i>Desaparecida</span>
+      </div>
+    </div>
+
+    <div id="results" class="results"></div>
+    <button id="moreBtn" class="moreBtn" type="button" style="display:none">Ver más</button>
+  </aside>
+
+  <section id="layersPanel" class="layersPanel">
+    <div class="panelHead">
+      <strong>Capas del mapa</strong>
+      <button class="closeBtn" data-close="layersPanel" type="button">×</button>
+    </div>
+
+    <div class="sectionTitle">Mapa base</div>
+    <label class="layerOption"><input type="radio" name="baseLayer" value="ignBase" checked> <span>IGN · Mapa base<small>Cartografía oficial de referencia</small></span></label>
+    <label class="layerOption"><input type="radio" name="baseLayer" value="osm"> <span>OpenStreetMap<small>Mapa claro y rápido</small></span></label>
+    <label class="layerOption"><input type="radio" name="baseLayer" value="ignRaster"> <span>IGN · Mapa ráster<small>Cartografía topográfica</small></span></label>
+
+    <div class="sectionTitle">Ortofotos</div>
+    <label class="layerOption"><input type="radio" name="baseLayer" value="pnoa"> <span>PNOA · Actual<small>Ortofoto de máxima actualidad</small></span></label>
+    <label class="layerOption"><input type="radio" name="baseLayer" value="americano"> <span>Vuelo Americano · 1956–57<small>Ortofoto histórica</small></span></label>
+
+    <div class="sectionTitle">Cartografía histórica</div>
+    <label class="layerOption"><input type="radio" name="baseLayer" value="primera"> <span>MTN50 · Primera edición</span></label>
+    <label class="layerOption"><input type="radio" name="baseLayer" value="minutas"> <span>Minutas MTN50</span></label>
+
+    <div class="sectionTitle">Superposiciones</div>
+    <label class="layerOption"><input id="toggleCasillas" type="checkbox" checked> <span>Casillas de peones camineros</span></label>
+  </section>
+
+  <section id="filterPanel" class="filterPanel">
+    <div class="panelHead">
+      <strong>Filtros</strong>
+      <button class="closeBtn" data-close="filterPanel" type="button">×</button>
+    </div>
+
+    <label for="provinceSelect">Provincia</label>
+    <select id="provinceSelect"><option value="">Todas las provincias</option></select>
+
+    <label for="roadSelect">Carretera</label>
+    <select id="roadSelect"><option value="">Todas las carreteras</option></select>
+
+    <label for="stateSelect">Estado</label>
+    <select id="stateSelect">
+      <option value="">Todos los estados</option>
+      <option value="En pie">En pie</option>
+      <option value="Ruinas">En ruinas</option>
+      <option value="Abandonada">Abandonada</option>
+      <option value="Desaparecida / demolida">Desaparecida / demolida</option>
+      <option value="Otro / sin clasificar">Otro / sin clasificar</option>
+    </select>
+
+    <div class="filterActions">
+      <button id="applyFilters" class="primary" type="button">Aplicar</button>
+      <button id="clearFilters" class="secondary" type="button">Limpiar</button>
+    </div>
+  </section>
+
+  <section id="infoCard" class="infoCard" aria-live="polite">
+    <div class="cardHero">
+      <button id="cardClose" class="cardClose" type="button">×</button>
+      <svg viewBox="0 0 240 120" aria-hidden="true">
+        <rect x="30" y="50" width="180" height="55" rx="3" fill="#c8b89a" stroke="#6d6252" stroke-width="2"/>
+        <path d="M20 52 L120 14 L220 52 Z" fill="#bd6c3b" stroke="#78452f" stroke-width="3"/>
+        <rect x="52" y="18" width="18" height="34" fill="#ad5b31"/>
+        <rect x="170" y="18" width="18" height="34" fill="#ad5b31"/>
+        <rect x="104" y="65" width="32" height="40" fill="#79513e"/>
+        <rect x="55" y="69" width="30" height="23" fill="#38444b"/>
+        <rect x="155" y="69" width="30" height="23" fill="#38444b"/>
+        <rect x="91" y="51" width="58" height="13" rx="3" fill="#346c94"/>
+        <text x="120" y="60" text-anchor="middle" font-size="7" fill="#fff" font-family="Arial" font-weight="700">PEONES CAMINEROS</text>
+      </svg>
+    </div>
+    <div class="cardBody">
+      <h2 id="cardTitle">Casilla</h2>
+      <div class="dataGrid">
+        <b>Carretera</b><span id="cardRoad">—</span>
+        <b>PK</b><span id="cardPk">—</span>
+        <b>Municipio</b><span id="cardMunicipio">—</span>
+        <b>Provincia</b><span id="cardProvincia">—</span>
+      </div>
+      <div id="cardState" class="cardState">● Estado</div>
+      <div class="cardButtons">
+        <a id="streetLink" class="btnStreet" target="_blank" rel="noopener">Street View</a>
+        <a id="mapsLink" class="btnMaps" target="_blank" rel="noopener">Google Maps</a>
+        <button id="compareBtn" class="btnCompare" type="button">Comparar 1956 ↔ Actual</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="statusChip" class="statusChip">IGN · Mapa base</div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="casillas_peones_camineros.js"></script>
+
+<script>
+(function(){
+"use strict";
+
+const state = {
+  pageSize: 80,
+  visible: 80,
+  current: [],
+  selectedId: null,
+  activeBase: null
+};
+
+const $ = id => document.getElementById(id);
+
+if(!window.L){
+  $("countInfo").textContent = "Error: Leaflet no se cargó.";
+  return;
+}
+
+const source = window.CASILLAS_PEONES_GEOJSON;
+if(!source || !Array.isArray(source.features)){
+  $("countInfo").textContent = "Error: no se cargaron los datos.";
+  return;
+}
+
+const records = source.features.filter(f =>
+  f && f.geometry && f.geometry.type==="Point" &&
+  Array.isArray(f.geometry.coordinates) &&
+  Number.isFinite(Number(f.geometry.coordinates[0])) &&
+  Number.isFinite(Number(f.geometry.coordinates[1]))
+);
+
+function esc(v){
+  return String(v==null?"":v)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function norm(v){
+  return String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+}
+
+function stateColor(s){
+  if(s==="En pie") return "#26884f";
+  if(s==="Ruinas") return "#d48a23";
+  if(s==="Abandonada") return "#956e45";
+  if(s==="Desaparecida / demolida") return "#c73535";
+  return "#777";
+}
+
+function housePin(color){
+  const svg = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="38" height="48" viewBox="0 0 44 54">
+    <path d="M22 1C10.4 1 1 10.4 1 22C1 37 22 53 22 53C22 53 43 37 43 22C43 10.4 33.6 1 22 1Z" fill="#b96b28" stroke="#fff" stroke-width="2"/>
+    <circle cx="22" cy="21" r="15" fill="#f7efe1"/>
+    <rect x="12" y="10" width="4" height="8" rx="1" fill="#a95b35"/>
+    <rect x="28" y="10" width="4" height="8" rx="1" fill="#a95b35"/>
+    <path d="M8 20L22 12L36 20Z" fill="#bd7042" stroke="#6b4534"/>
+    <rect x="10" y="20" width="24" height="15" rx="1" fill="#c9b99b" stroke="#655d51"/>
+    <rect x="13" y="24" width="5" height="6" fill="#354149"/>
+    <rect x="26" y="24" width="5" height="6" fill="#354149"/>
+    <rect x="20" y="23" width="5" height="12" fill="#73503d"/>
+    <rect x="17" y="19" width="10" height="3" rx="1" fill="#356d96"/>
+    <circle cx="34" cy="36" r="5" fill="${color}" stroke="#fff" stroke-width="2"/>
+  </svg>`;
+  return L.divIcon({
+    className:"cpPin",
+    html:svg,
+    iconSize:[38,48],
+    iconAnchor:[19,47],
+    popupAnchor:[0,-42]
+  });
+}
+
+const map = L.map("map",{
+  zoomControl:true,
+  scrollWheelZoom:true,
+  preferCanvas:true
+});
+
+/* Fondo: IGN por defecto */
+const baseLayers = {
+  osm: L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
+    maxZoom:19,
+    attribution:"&copy; OpenStreetMap contributors"
+  }),
+  ignBase: L.tileLayer("https://www.ign.es/wmts/ign-base?service=WMTS&request=GetTile&version=1.0.0&layer=IGNBaseTodo&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{
+    maxZoom:20, attribution:"&copy; IGN"
+  }),
+  ignRaster: L.tileLayer("https://www.ign.es/wmts/mapa-raster?service=WMTS&request=GetTile&version=1.0.0&layer=MTN&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{
+    maxZoom:20, attribution:"&copy; IGN"
+  }),
+  pnoa: L.tileLayer("https://www.ign.es/wmts/pnoa-ma?service=WMTS&request=GetTile&version=1.0.0&layer=OI.OrthoimageCoverage&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{
+    maxZoom:20, attribution:"PNOA &copy; IGN-CNIG"
+  }),
+  americano: L.tileLayer.wms("https://www.ign.es/wms/pnoa-historico",{
+    layers:"AMS_1956-1957",format:"image/jpeg",transparent:false,version:"1.3.0",
+    attribution:"Vuelo Americano 1956-1957 · IGN"
+  }),
+  primera: L.tileLayer("https://www.ign.es/wmts/primera-edicion-mtn?service=WMTS&request=GetTile&version=1.0.0&layer=mtn50-edicion1&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{
+    maxZoom:18, attribution:"Primera edición MTN50 · IGN"
+  }),
+  minutas: L.tileLayer("https://www.ign.es/wmts/primera-edicion-mtn?service=WMTS&request=GetTile&version=1.0.0&layer=catastrones&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{
+    maxZoom:18, attribution:"Minutas MTN50 · IGN"
+  })
+};
+
+function setBase(name){
+  if(state.activeBase) map.removeLayer(state.activeBase);
+  state.activeBase = baseLayers[name] || baseLayers.osm;
+  state.activeBase.addTo(map);
+  const labels={
+    ignBase:"IGN · Mapa base",osm:"OpenStreetMap",ignRaster:"IGN · Mapa ráster",
+    pnoa:"PNOA · Actual",americano:"Vuelo Americano · 1956–57",
+    primera:"MTN50 · Primera edición",minutas:"Minutas MTN50"
+  };
+  $("statusChip").textContent = labels[name] || "Mapa";
+}
+
+setBase("ignBase");
+
+let cluster;
+if(typeof L.markerClusterGroup==="function"){
+  cluster = L.markerClusterGroup({
+    chunkedLoading:true,
+    chunkInterval:120,
+    chunkDelay:20,
+    maxClusterRadius:48,
+    showCoverageOnHover:false,
+    spiderfyOnMaxZoom:true,
+    removeOutsideVisibleBounds:true
+  });
+}else{
+  cluster = L.layerGroup();
+}
+cluster.addTo(map);
+
+const markerById = new Map();
+
+function buildMarker(feature){
+  const p = feature.properties||{};
+  const lon=Number(feature.geometry.coordinates[0]);
+  const lat=Number(feature.geometry.coordinates[1]);
+  const cat=p.estado_categoria||"Otro / sin clasificar";
+  const marker=L.marker([lat,lon],{icon:housePin(stateColor(cat))});
+  marker.on("click",()=>openCard(feature,marker));
+  markerById.set(p.id,marker);
+  return marker;
+}
+
+function openCard(feature,marker){
+  const p=feature.properties||{};
+  const lon=Number(feature.geometry.coordinates[0]);
+  const lat=Number(feature.geometry.coordinates[1]);
+  const cat=p.estado_categoria||"Otro / sin clasificar";
+  const sv=p.street_view || `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lon}`;
+  const gm=`https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+
+  $("cardTitle").textContent=p.nombre||"Casilla de peones camineros";
+  $("cardRoad").textContent=p.carretera||"—";
+  $("cardPk").textContent=p.pk||"—";
+  $("cardMunicipio").textContent=p.municipio||"—";
+  $("cardProvincia").textContent=p.provincia||"—";
+  $("cardState").textContent="● "+(p.estado_actual||cat);
+  $("cardState").style.color=stateColor(cat);
+  $("streetLink").href=sv;
+  $("mapsLink").href=gm;
+  $("infoCard").classList.add("open");
+
+  state.selectedId=p.id;
+  document.querySelectorAll(".result.active").forEach(el=>el.classList.remove("active"));
+  const row=document.querySelector(`[data-id="${CSS.escape(String(p.id))}"]`);
+  if(row) row.classList.add("active");
+
+  if(marker && typeof cluster.zoomToShowLayer==="function"){
+    cluster.zoomToShowLayer(marker,()=>{ map.panTo(marker.getLatLng()); });
+  }else if(marker){
+    map.panTo(marker.getLatLng());
+  }
+}
+
+function uniqueValues(field){
+  const s=new Set();
+  records.forEach(f=>{
+    const v=(f.properties||{})[field];
+    if(v!=null && String(v).trim()) s.add(String(v).trim());
+  });
+  return [...s].sort((a,b)=>a.localeCompare(b,"es",{numeric:true,sensitivity:"base"}));
+}
+
+function fillSelect(id,field){
+  const select=$(id);
+  uniqueValues(field).forEach(v=>{
+    const o=document.createElement("option");
+    o.value=v;o.textContent=v;select.appendChild(o);
+  });
+}
+fillSelect("provinceSelect","provincia");
+fillSelect("roadSelect","carretera");
+
+function renderResults(){
+  const box=$("results");
+  box.innerHTML="";
+  const limit=Math.min(state.visible,state.current.length);
+
+  for(let i=0;i<limit;i++){
+    const f=state.current[i];
+    const p=f.properties||{};
+    const row=document.createElement("div");
+    row.className="result"+(p.id===state.selectedId?" active":"");
+    row.dataset.id=String(p.id);
+    row.innerHTML=`
+      <div class="resultTitle">${esc(p.nombre||"Casilla de peones camineros")}</div>
+      <div class="resultMeta">
+        ${esc([p.carretera,p.pk?("PK "+p.pk):""].filter(Boolean).join(" · "))}
+        ${(p.carretera||p.pk)&&(p.municipio||p.provincia)?"<br>":""}
+        ${esc([p.municipio,p.provincia].filter(Boolean).join(" · "))}
+      </div>
+      <div class="resultState" style="color:${stateColor(p.estado_categoria)}">● ${esc(p.estado_categoria||"Otro / sin clasificar")}</div>`;
+    row.onclick=()=>{
+      const m=markerById.get(p.id);
+      if(!m) return;
+      if(typeof cluster.zoomToShowLayer==="function"){
+        cluster.zoomToShowLayer(m,()=>{
+          map.setView(m.getLatLng(),Math.max(map.getZoom(),14));
+          openCard(f,m);
+        });
+      }else{
+        map.setView(m.getLatLng(),14);
+        openCard(f,m);
+      }
+    };
+    box.appendChild(row);
+  }
+
+  const more=$("moreBtn");
+  if(limit<state.current.length){
+    more.style.display="block";
+    more.textContent=`Ver más (${state.current.length-limit})`;
+  }else{
+    more.style.display="none";
+  }
+}
+
+function draw(features,fit=true){
+  cluster.clearLayers();
+  markerById.clear();
+
+  const markers=[];
+  const bounds=[];
+
+  features.forEach(f=>{
+    const m=buildMarker(f);
+    markers.push(m);
+    const c=f.geometry.coordinates;
+    bounds.push([Number(c[1]),Number(c[0])]);
+  });
+
+  if(typeof cluster.addLayers==="function") cluster.addLayers(markers);
+  else markers.forEach(m=>cluster.addLayer(m));
+
+  state.current=features;
+  state.visible=state.pageSize;
+  $("count").textContent=features.length.toLocaleString("es-ES");
+  $("countInfo").textContent=features.length===records.length ? "Inventario completo" : "Resultados filtrados";
+  renderResults();
+
+  if(fit && bounds.length){
+    map.fitBounds(bounds,{padding:[40,40],maxZoom:6});
+  }
+}
+
+function applyFilters(){
+  const q=norm($("searchInput").value.trim());
+  const prov=$("provinceSelect").value;
+  const road=$("roadSelect").value;
+  const st=$("stateSelect").value;
+
+  const filtered=records.filter(f=>{
+    const p=f.properties||{};
+    const text=norm([
+      p.nombre,p.carretera,p.pk,p.municipio,p.provincia,
+      p.estado_actual,p.estado_categoria,p.descripcion_texto
+    ].filter(Boolean).join(" "));
+    return (!q||text.includes(q)) &&
+           (!prov||p.provincia===prov) &&
+           (!road||p.carretera===road) &&
+           (!st||p.estado_categoria===st);
+  });
+
+  $("infoCard").classList.remove("open");
+  state.selectedId=null;
+  draw(filtered,true);
+  $("filterPanel").classList.remove("open");
+}
+
+function clearFilters(){
+  $("searchInput").value="";
+  $("provinceSelect").value="";
+  $("roadSelect").value="";
+  $("stateSelect").value="";
+  $("infoCard").classList.remove("open");
+  state.selectedId=null;
+  draw(records,true);
+}
+
+$("searchBtn").onclick=applyFilters;
+$("searchInput").addEventListener("keydown",e=>{if(e.key==="Enter") applyFilters();});
+$("applyFilters").onclick=applyFilters;
+$("clearFilters").onclick=clearFilters;
+$("moreBtn").onclick=()=>{state.visible+=state.pageSize;renderResults();};
+
+$("layersBtn").onclick=()=>{
+  $("filterPanel").classList.remove("open");
+  $("layersPanel").classList.toggle("open");
+};
+$("filterBtn").onclick=()=>{
+  $("layersPanel").classList.remove("open");
+  $("filterPanel").classList.toggle("open");
+};
+document.querySelectorAll("[data-close]").forEach(btn=>{
+  btn.onclick=()=>$(btn.dataset.close).classList.remove("open");
+});
+
+document.querySelectorAll('input[name="baseLayer"]').forEach(r=>{
+  r.addEventListener("change",()=>{ if(r.checked) setBase(r.value); });
+});
+
+$("toggleCasillas").onchange=function(){
+  if(this.checked){
+    if(!map.hasLayer(cluster)) map.addLayer(cluster);
+  }else{
+    if(map.hasLayer(cluster)) map.removeLayer(cluster);
+  }
+};
+
+$("cardClose").onclick=()=>$("infoCard").classList.remove("open");
+
+$("compareBtn").onclick=()=>{
+  if(state.selectedId==null) return;
+  const f=records.find(x=>(x.properties||{}).id===state.selectedId);
+  if(!f) return;
+  const lon=Number(f.geometry.coordinates[0]);
+  const lat=Number(f.geometry.coordinates[1]);
+  alert("Comparador 1956 ↔ Actual: será el siguiente módulo. Coordenadas seleccionadas: "+lat.toFixed(6)+", "+lon.toFixed(6));
+};
+
+function toggleMobileSheet(){
+  if(window.innerWidth<=900) $("sidebar").classList.toggle("collapsed");
+}
+$("sheetHandle").onclick=toggleMobileSheet;
+$("collapseBtn").onclick=toggleMobileSheet;
+
+/* Ocultar automáticamente el panel de resultados en móvil tras elegir una casilla */
+window.addEventListener("resize",()=>setTimeout(()=>map.invalidateSize(),100));
+
+/* Vista inicial del conjunto completo */
+draw(records,true);
+setTimeout(()=>map.invalidateSize(),250);
+
+})();
+</script>
+</body>
+</html>
