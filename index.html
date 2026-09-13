@@ -1731,6 +1731,24 @@ button,input,select{
 }
 </style>
 
+
+<style id="mapa-base-centrado-area-visible">
+/* Centrar "IGN · Mapa base" respecto al área visible del mapa */
+@media (min-width:921px){
+  #mapChip.map-chip{
+    left:calc(50% + 215px) !important;
+    transform:translateX(-50%) !important;
+  }
+}
+
+@media (max-width:920px){
+  #mapChip.map-chip{
+    left:50% !important;
+    transform:translateX(-50%) !important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div id="app">
