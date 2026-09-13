@@ -2056,6 +2056,174 @@ button,input,select{
 }
 </style>
 
+
+<style id="paso7-ficha-ordenada">
+/* PASO 7 — ficha sin fotos, más clara y documental */
+.card{
+  width:445px !important;
+  max-height:calc(100vh - 126px) !important;
+}
+.card-head{
+  min-height:76px !important;
+  padding:11px 45px 10px 13px !important;
+  background:#fff !important;
+  border-bottom:1px solid #e2e7eb !important;
+  border-top:5px solid var(--cat) !important;
+}
+.card-icon-small{
+  width:43px;
+  height:49px;
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+}
+.card-icon-small img{
+  width:43px !important;
+  height:49px !important;
+  object-fit:contain !important;
+}
+.card-title{
+  font-size:22px !important;
+  color:#1f2b3d !important;
+}
+.card-type{
+  margin-top:3px !important;
+  color:var(--cat) !important;
+  font-size:10.5px !important;
+  font-weight:800 !important;
+}
+.paso7-card-body{
+  padding:11px 12px 13px !important;
+}
+.info-block{
+  margin:0 0 10px;
+}
+.info-block>h4{
+  margin:0 0 5px;
+  padding:0 1px;
+  font-family:Georgia,"Times New Roman",serif;
+  color:#263448;
+  font-size:14px;
+  line-height:1.15;
+}
+.info-grid{
+  border:1px solid #dfe5ea;
+  border-radius:8px;
+  overflow:hidden;
+  background:#fff;
+}
+.info-row{
+  display:grid;
+  grid-template-columns:132px minmax(0,1fr);
+  min-height:30px;
+  border-bottom:1px solid #e5eaee;
+  font-size:11.5px;
+}
+.info-row:last-child{border-bottom:0}
+.info-row>b{
+  padding:7px 8px;
+  background:#f3f6f8;
+  border-right:1px solid #dfe5ea;
+  color:#334156;
+  font-weight:800;
+}
+.info-row>span{
+  min-width:0;
+  padding:7px 9px;
+  color:#243244;
+  overflow-wrap:anywhere;
+}
+.coord-value{
+  display:flex !important;
+  align-items:center;
+  justify-content:space-between;
+  gap:7px;
+}
+.copy-coords{
+  border:0;
+  background:transparent;
+  color:#2d659e;
+  padding:0 2px;
+  font-size:16px;
+}
+.protection-block{
+  padding:9px 10px;
+  border:1px solid #e4d69b;
+  border-radius:8px;
+  background:#fff9e8;
+}
+.protection-block>h4{
+  color:#6d5716;
+}
+.protection-section{
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  font-size:11.5px !important;
+  line-height:1.45 !important;
+  color:#554b2c !important;
+}
+.description-block,
+.sources-block{
+  padding-top:8px;
+  border-top:1px solid #e3e8ec;
+}
+.card-text{
+  font-size:11.8px !important;
+  line-height:1.48 !important;
+  color:#45515f !important;
+  white-space:pre-line;
+}
+.source-list{
+  display:grid;
+  gap:5px;
+  font-size:11.3px;
+}
+.source-item{
+  padding:6px 7px;
+  border:1px solid #e1e6ea;
+  border-radius:7px;
+  background:#fafbfd;
+}
+.source-item a{
+  color:#245aa3;
+  text-decoration:none;
+  font-weight:700;
+}
+.paso7-actions{
+  margin-top:10px !important;
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:7px !important;
+}
+.paso7-actions a{
+  padding:8px 7px !important;
+  border-radius:8px !important;
+  font-size:11px !important;
+  font-weight:800 !important;
+}
+.paso7-actions .source{
+  grid-column:1/-1;
+}
+.prot-banner{
+  padding:7px 13px !important;
+  font-size:11px !important;
+}
+@media(max-width:920px){
+  .card{
+    width:auto !important;
+    max-height:68vh !important;
+  }
+}
+@media(max-width:560px){
+  .info-row{
+    grid-template-columns:112px minmax(0,1fr);
+    font-size:11px;
+  }
+  .card-title{font-size:19px !important}
+}
+</style>
+
 </head>
 <body>
 <div id="app">
@@ -2358,35 +2526,52 @@ button,input,select{
 
     <div id="protBanner" class="prot-banner">🛡 Patrimonio protegido</div>
 
-    <div class="card-body">
-      <div class="detail-table">
-        <div class="detail-row"><b>Carretera</b><span id="cardRoad">—</span></div>
-        <div class="detail-row"><b>PK aproximado</b><span id="cardPk">—</span></div>
-        <div class="detail-row"><b>Municipio</b><span id="cardMunicipio">—</span></div>
-        <div class="detail-row"><b>Provincia</b><span id="cardProvincia">—</span></div>
-        <div class="detail-row">
-          <b>Coordenadas</b>
-          <span class="coord-value"><span id="cardCoords">—</span><button id="copyCoords" class="copy-coords" type="button" title="Copiar coordenadas">⧉</button></span>
+    <div class="card-body paso7-card-body">
+
+      <section class="info-block">
+        <h4>Localización</h4>
+        <div class="info-grid">
+          <div id="rowRoad" class="info-row"><b>Carretera actual</b><span id="cardRoad">—</span></div>
+          <div id="rowRoadHistoric" class="info-row"><b>Carretera histórica</b><span id="cardRoadHistoric">—</span></div>
+          <div id="rowPk" class="info-row"><b>PK</b><span id="cardPk">—</span></div>
+          <div id="rowMunicipio" class="info-row"><b>Municipio</b><span id="cardMunicipio">—</span></div>
+          <div id="rowProvincia" class="info-row"><b>Provincia</b><span id="cardProvincia">—</span></div>
+          <div id="rowCoords" class="info-row">
+            <b>Coordenadas</b>
+            <span class="coord-value">
+              <span id="cardCoords">—</span>
+              <button id="copyCoords" class="copy-coords" type="button" title="Copiar coordenadas">⧉</button>
+            </span>
+          </div>
         </div>
-        <div class="detail-row"><b>Tipo</b><span id="cardTypeRow">—</span></div>
-        <div class="detail-row"><b>Estado</b><span id="cardState">—</span></div>
-        <div class="detail-row"><b>Protección</b><span id="cardProtection">—</span></div>
-        <div id="subtypeRow" class="detail-row"><b>Subtipo</b><span id="cardSubtype">—</span></div>
-      </div>
+      </section>
 
-      <div id="protInfo" class="card-section protection-section" style="display:none"></div>
+      <section class="info-block">
+        <h4>Identificación y estado</h4>
+        <div class="info-grid">
+          <div id="rowType" class="info-row"><b>Tipo</b><span id="cardTypeRow">—</span></div>
+          <div id="subtypeRow" class="info-row"><b>Subtipo</b><span id="cardSubtype">—</span></div>
+          <div id="rowState" class="info-row"><b>Estado</b><span id="cardState">—</span></div>
+          <div id="rowProtection" class="info-row"><b>Protección</b><span id="cardProtection">—</span></div>
+        </div>
+      </section>
 
-      <section id="descriptionSection" class="card-section">
+      <section id="protectionSection" class="info-block protection-block" style="display:none">
+        <h4>Protección patrimonial</h4>
+        <div id="protInfo" class="protection-section"></div>
+      </section>
+
+      <section id="descriptionSection" class="info-block description-block">
         <h4>Descripción</h4>
         <div id="cardDesc" class="card-text"></div>
       </section>
 
-      <section id="sourcesSection" class="card-section" style="display:none">
+      <section id="sourcesSection" class="info-block sources-block" style="display:none">
         <h4>Fuentes</h4>
         <div id="cardSources" class="source-list"></div>
       </section>
 
-      <div class="card-actions">
+      <div class="card-actions paso7-actions">
         <a id="streetBtn" class="street" target="_blank" rel="noopener">Street View</a>
         <a id="mapsBtn" class="maps" target="_blank" rel="noopener">Google Maps</a>
         <a id="sourceBtn" class="source" target="_blank" rel="noopener" style="display:none">Documento de protección</a>
@@ -2947,6 +3132,16 @@ function renderResults(){
   }else $("moreBtn").style.display="none";
 }
 
+
+function setCardRow(rowId,valueId,value,always=false){
+  const row=$(rowId);
+  const node=$(valueId);
+  const text=String(value==null?"":value).trim();
+  if(node) node.textContent=text || "—";
+  if(row) row.style.display=(always || text) ? "grid" : "none";
+  return Boolean(text);
+}
+
 function selectFeature(f,zoom=true){
   const id=String(idOf(f)); state.selectedId=id;
   const p=f.properties||{}, c=categoryOf(f), m=markerById.get(id);
@@ -2958,43 +3153,48 @@ function selectFeature(f,zoom=true){
   $("cardIcon").innerHTML=cardIcon(c);
   $("cardTitle").textContent=p.Nombre||CATEGORY[c].label;
   $("cardType").textContent=`${CATEGORY[c].label} · ${p.ID||id}`;
-  $("cardRoad").textContent=p.Carretera_actual||p.Carretera_historica||"—";
-  $("cardPk").textContent=p.PK||"—";
-  $("cardMunicipio").textContent=p.Municipio_Concelho||p.Localidad||"—";
-  $("cardProvincia").textContent=p.Provincia_Distrito || p.Provincia_INE || p.Provincia_original || "—";
+
+  const currentRoad=p.Carretera_actual||"";
+  const historicRoad=p.Carretera_historica||"";
+  setCardRow("rowRoad","cardRoad",currentRoad || historicRoad,true);
+  setCardRow("rowRoadHistoric","cardRoadHistoric",
+    historicRoad && norm(historicRoad)!==norm(currentRoad) ? historicRoad : "",false);
+  setCardRow("rowPk","cardPk",p.PK||p.Punto_kilometrico||"",false);
+  setCardRow("rowMunicipio","cardMunicipio",p.Municipio_Concelho||p.Localidad||"",true);
+  setCardRow("rowProvincia","cardProvincia",
+    p.Provincia_Distrito||p.Provincia_INE||p.Provincia_original||"",true);
 
   const ctr=centerOf(f);
   const lat=ctr ? Number(ctr[0]) : NaN;
   const lon=ctr ? Number(ctr[1]) : NaN;
   const coords=(Number.isFinite(lat)&&Number.isFinite(lon))
     ? `${lat.toFixed(6)}, ${lon.toFixed(6)}`
-    : "—";
-  $("cardCoords").textContent=coords;
+    : "";
+  setCardRow("rowCoords","cardCoords",coords,true);
 
-  $("cardTypeRow").textContent=p.Tipo||CATEGORY[c].label;
-  $("cardState").textContent=p.Estado_actual||p.Estado_categoria||"—";
+  setCardRow("rowType","cardTypeRow",p.Tipo||CATEGORY[c].label,true);
+  setCardRow("subtypeRow","cardSubtype",p.Subtipo||p.Tipo_monumento||"",false);
+  setCardRow("rowState","cardState",p.Estado_actual||p.Estado_categoria||"",true);
 
   const protectionLabel=isProtected(f)
     ? (p.Figura_proteccion||p.Nivel_proteccion||p.Proteccion||"Protegido")
     : "Sin protección conocida";
-  $("cardProtection").textContent=protectionLabel;
-
-  const subtype=String(p.Subtipo||p.Tipo_monumento||"").trim();
-  $("cardSubtype").textContent=subtype||"—";
-  $("subtypeRow").style.display=subtype?"grid":"none";
+  setCardRow("rowProtection","cardProtection",protectionLabel,true);
 
   const desc=String(p.Descripcion||"").trim();
-  $("cardDesc").textContent=desc || "Sin descripción adicional.";
+  $("descriptionSection").style.display=desc?"block":"none";
+  $("cardDesc").textContent=desc;
 
   $("protBanner").classList.toggle("show",isProtected(f));
   const protBits=[
-    p.Figura_proteccion ? `<b>Protección:</b> ${esc(p.Figura_proteccion)}` : "",
+    p.Figura_proteccion ? `<b>Figura:</b> ${esc(p.Figura_proteccion)}` : "",
+    p.Nivel_proteccion ? `<b>Nivel:</b> ${esc(p.Nivel_proteccion)}` : "",
     p.Catalogo_registro ? `<b>Catálogo / plan:</b> ${esc(p.Catalogo_registro)}` : "",
     p.Fecha_proteccion ? `<b>Fecha:</b> ${esc(p.Fecha_proteccion)}` : "",
     p.Numero_expediente ? `<b>Expediente:</b> ${esc(p.Numero_expediente)}` : "",
     p.Observaciones_proteccion ? esc(p.Observaciones_proteccion) : ""
   ].filter(Boolean);
-  $("protInfo").style.display=protBits.length?"block":"none";
+  $("protectionSection").style.display=protBits.length?"block":"none";
   $("protInfo").innerHTML=protBits.join("<br>");
 
   renderSources(p);
