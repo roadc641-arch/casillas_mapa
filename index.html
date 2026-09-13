@@ -1347,6 +1347,94 @@ a{text-decoration:none}
 }
 </style>
 
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700;900&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap" rel="stylesheet">
+
+
+<style id="estilo-c-tipografia">
+/* ESTILO C — Nunito Sans + Merriweather */
+:root{
+  --font-ui:"Nunito Sans",Arial,Helvetica,sans-serif;
+  --font-title:"Merriweather",Georgia,"Times New Roman",serif;
+}
+html,body{
+  font-family:var(--font-ui) !important;
+}
+button,input,select{
+  font-family:var(--font-ui) !important;
+}
+
+/* Título principal */
+.header-center .brand-title,
+.brand-title{
+  font-family:var(--font-title) !important;
+  font-weight:900 !important;
+  letter-spacing:-0.02em !important;
+}
+
+/* Bloque izquierdo de la cabecera */
+.project-name{
+  font-family:var(--font-title) !important;
+  font-weight:700 !important;
+  letter-spacing:-0.01em !important;
+}
+.project-web{
+  font-family:var(--font-ui) !important;
+  font-weight:800 !important;
+}
+
+/* Encabezados del panel y de la ficha */
+.advanced-filter-title strong,
+.results-summary strong,
+.card-title,
+.card-section h4,
+.total{
+  font-family:var(--font-title) !important;
+  font-weight:700 !important;
+}
+
+/* Resto de interfaz */
+.search-help,
+.advanced-grid label>span,
+.advanced-grid select,
+.advanced-grid input,
+.result,
+.rtitle,
+.rmeta,
+.badge,
+.header-btn,
+.side-btn,
+.sidebar-clear,
+.sort-compact,
+.detail-row,
+.card-type,
+.card-text,
+.source-list,
+.card-actions a{
+  font-family:var(--font-ui) !important;
+}
+
+/* Toque suave del estilo C */
+.header-btn{
+  border-radius:12px !important;
+}
+.sidebar,
+.card,
+.topbar{
+  border-color:rgba(31,73,50,.10) !important;
+}
+.header-btn.active{
+  background:#eef7f0 !important;
+  border-color:#b7d3bd !important;
+  color:#25613b !important;
+}
+.header-btn.active svg{
+  fill:#25613b !important;
+}
+</style>
+
 </head>
 <body>
 <div id="app">
