@@ -1813,7 +1813,7 @@ button,input,select{
 #canaryInsetWrap{
   position:absolute;
   z-index:690;
-  left:445px;
+  left:448px;
   bottom:46px;
   width:205px;
   height:132px;
@@ -2700,14 +2700,15 @@ function syncTopButtons(){
 
 
 function fitSpain(){
-  /* Península, Baleares, Ceuta y Melilla ocupan el mapa principal.
-     Canarias permanece visible en el recuadro inferior izquierdo. */
-  const bounds=L.latLngBounds([[35.0,-10.2],[44.35,4.85]]);
+  /* Encuadre más cercano de España:
+     Península y Baleares ocupan casi todo el área visible del mapa.
+     Canarias sigue en su recuadro independiente. */
+  const bounds=L.latLngBounds([[35.35,-9.75],[43.95,4.45]]);
   if(window.innerWidth>920){
     map.fitBounds(bounds,{
       paddingTopLeft:[455,118],
-      paddingBottomRight:[36,42],
-      maxZoom:6,
+      paddingBottomRight:[26,28],
+      maxZoom:6.45,
       animate:false
     });
     setTimeout(()=>{
@@ -2716,9 +2717,9 @@ function fitSpain(){
     },80);
   }else{
     map.fitBounds(bounds,{
-      paddingTopLeft:[20,100],
-      paddingBottomRight:[20,Math.max(110,Math.round(window.innerHeight*.44)+20)],
-      maxZoom:6,
+      paddingTopLeft:[20,96],
+      paddingBottomRight:[20,Math.max(110,Math.round(window.innerHeight*.44)+18)],
+      maxZoom:6.2,
       animate:false
     });
   }
