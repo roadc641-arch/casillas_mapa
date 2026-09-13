@@ -1807,10 +1807,53 @@ button,input,select{
 }
 </style>
 
+
+<style id="encuadre-espana-con-canarias">
+/* Encuadre inicial: Península + Baleares en grande y Canarias en recuadro */
+#canaryInsetWrap{
+  position:absolute;
+  z-index:690;
+  left:445px;
+  bottom:46px;
+  width:205px;
+  height:132px;
+  background:#fff;
+  border:1px solid rgba(20,31,48,.18);
+  border-radius:10px;
+  box-shadow:0 5px 16px rgba(20,31,48,.16);
+  overflow:hidden;
+  pointer-events:none;
+}
+#canaryInset{
+  position:absolute;
+  inset:0;
+}
+.canary-inset-title{
+  position:absolute;
+  z-index:800;
+  left:7px;
+  top:6px;
+  padding:3px 7px;
+  border-radius:999px;
+  background:rgba(255,255,255,.93);
+  color:#263548;
+  font-size:10px;
+  font-weight:800;
+  box-shadow:0 1px 4px rgba(20,31,48,.12);
+}
+@media(max-width:920px){
+  #canaryInsetWrap{display:none}
+}
+</style>
+
 </head>
 <body>
 <div id="app">
   <div id="map"></div>
+  <div id="canaryInsetWrap" aria-label="Mapa de las Islas Canarias">
+    <div class="canary-inset-title">Islas Canarias <span id="canaryCount"></span></div>
+    <div id="canaryInset"></div>
+  </div>
 
   <header class="topbar">
     <div class="header-project">
@@ -2215,6 +2258,49 @@ function listIcon(c){ return `<span class="ricon-svg">${svgIcon(c)}</span>`; }
 function cardIcon(c){ return `<span class="card-svg">${svgIcon(c)}</span>`; }
 
 const map=L.map("map",{zoomControl:true,preferCanvas:true,minZoom:2});
+
+const canaryBounds=L.latLngBounds([[27.25,-18.4],[29.65,-13.25]]);
+const canaryMap=L.map("canaryInset",{
+  zoomControl:false,
+  attributionControl:false,
+  dragging:false,
+  scrollWheelZoom:false,
+  doubleClickZoom:false,
+  boxZoom:false,
+  keyboard:false,
+  tap:false,
+  touchZoom:false,
+  preferCanvas:true
+});
+L.tileLayer("https://www.ign.es/wmts/ign-base?service=WMTS&request=GetTile&version=1.0.0&layer=IGNBaseTodo&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{
+  maxZoom:20
+}).addTo(canaryMap);
+const canaryPoints=L.layerGroup().addTo(canaryMap);
+canaryMap.fitBounds(canaryBounds,{padding:[4,4],animate:false});
+
+function updateCanaryInset(features){
+  canaryPoints.clearLayers();
+  let count=0;
+  features.forEach(f=>{
+    const center=centerOf(f);
+    if(!center) return;
+    const lat=center[0], lon=center[1];
+    if(lat>=27.0 && lat<=30.0 && lon>=-19.0 && lon<=-13.0){
+      const cat=CATEGORY[categoryOf(f)]||CATEGORY.CPC;
+      L.circleMarker(center,{
+        radius:3.3,
+        color:"#ffffff",
+        weight:1,
+        fillColor:cat.color,
+        fillOpacity:.95,
+        interactive:false
+      }).addTo(canaryPoints);
+      count++;
+    }
+  });
+  const cc=$("canaryCount");
+  if(cc) cc.textContent=count?`(${count})`:"";
+}
 const baseLayers={
   osm:L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"&copy; OpenStreetMap contributors"}),
   ignBase:L.tileLayer("https://www.ign.es/wmts/ign-base?service=WMTS&request=GetTile&version=1.0.0&layer=IGNBaseTodo&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{maxZoom:20,attribution:"&copy; IGN"}),
@@ -2271,6 +2357,7 @@ function renderMap(features,fit){
     addGeometry(f);
   });
   cluster.addLayers(markers);
+  updateCanaryInset(features);
   if(!$("showMarkers").checked && map.hasLayer(cluster)) map.removeLayer(cluster);
   else if($("showMarkers").checked && !map.hasLayer(cluster)) map.addLayer(cluster);
   if(!$("showGeometries").checked && map.hasLayer(geometries)) map.removeLayer(geometries);
@@ -2613,17 +2700,25 @@ function syncTopButtons(){
 
 
 function fitSpain(){
-  const bounds = L.latLngBounds([[27.3,-18.7],[44.4,4.8]]);
-  if(window.innerWidth > 920){
+  /* Península, Baleares, Ceuta y Melilla ocupan el mapa principal.
+     Canarias permanece visible en el recuadro inferior izquierdo. */
+  const bounds=L.latLngBounds([[35.0,-10.2],[44.35,4.85]]);
+  if(window.innerWidth>920){
     map.fitBounds(bounds,{
       paddingTopLeft:[455,118],
-      paddingBottomRight:[35,35],
+      paddingBottomRight:[36,42],
+      maxZoom:6,
       animate:false
     });
+    setTimeout(()=>{
+      canaryMap.invalidateSize(false);
+      canaryMap.fitBounds(canaryBounds,{padding:[4,4],animate:false});
+    },80);
   }else{
     map.fitBounds(bounds,{
       paddingTopLeft:[20,100],
-      paddingBottomRight:[20,Math.max(110, Math.round(window.innerHeight*0.44)+20)],
+      paddingBottomRight:[20,Math.max(110,Math.round(window.innerHeight*.44)+20)],
+      maxZoom:6,
       animate:false
     });
   }
