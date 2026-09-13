@@ -1623,6 +1623,45 @@ button,input,select{
 }
 </style>
 
+
+<style id="mapa-base-informativo-abajo">
+.map-chip{
+  position:absolute !important;
+  z-index:700 !important;
+  left:50% !important;
+  right:auto !important;
+  bottom:14px !important;
+  transform:translateX(-50%) !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:7px !important;
+  padding:7px 12px !important;
+  background:rgba(255,255,255,.96) !important;
+  border:1px solid rgba(20,31,48,.10) !important;
+  border-radius:999px !important;
+  box-shadow:0 4px 13px rgba(20,31,48,.13) !important;
+  color:#263548 !important;
+  font-size:11px !important;
+  font-weight:800 !important;
+  cursor:default !important;
+  pointer-events:none !important;
+  user-select:none !important;
+}
+.map-chip-icon{
+  width:16px !important;
+  height:16px !important;
+  fill:#315f8f !important;
+  flex:0 0 auto !important;
+}
+@media(max-width:920px){
+  .map-chip{
+    bottom:calc(44vh + 18px) !important;
+    font-size:10px !important;
+    padding:6px 10px !important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div id="app">
@@ -1819,12 +1858,12 @@ button,input,select{
     </div>
   </section>
 
-  <button id="mapChip" class="map-chip" type="button" title="Mapa base actual · Pulsa para abrir Capas">
+  <div id="mapChip" class="map-chip" title="Mapa base actual" aria-live="polite">
     <svg class="map-chip-icon" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M3 5.5 8.5 3l7 2.5L21 3v15.5L15.5 21l-7-2.5L3 21V5.5zm6.5-.2v11.5l5 1.8V7.1l-5-1.8z"/>
     </svg>
     <span id="mapChipLabel">IGN · Mapa base</span>
-  </button>
+  </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -2500,11 +2539,6 @@ function toggleLayersPanel(){
 }
 
 $("layersBtn").onclick=toggleLayersPanel;
-$("mapChip").onclick=()=>{
-  if(!$("layersPanel").classList.contains("open")) $("layersPanel").classList.add("open");
-  syncTopButtons();
-};
-
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>{
   $(b.dataset.close).classList.remove("open");
   syncTopButtons();
