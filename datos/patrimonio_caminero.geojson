@@ -3,9 +3,9 @@
   "name": "Patrimonio caminero",
   "metadata": {
     "schema_version": "pc-1.0",
-    "updated_at": "2026-09-12",
+    "updated_at": "2026-09-13",
     "records": 2371,
-    "source": "GESTION_PC_PATRIMONIO_V1_2_2"
+    "source": "GESTION_PC_PATRIMONIO_V1_5"
   },
   "features": [
     {
@@ -6341,7 +6341,7 @@
         "Descripcion": "https://www.youtube.com/embed/0kfNeYSQl7s\nAC-101 PK 4+510 a la altura del actual trazado, la casilla se encuentra en el antiguo trazado de la AC-101, antigua LC-101.\nTérmino de As Pontes de García Rodríguez (A Coruña).\nEstado actual: en pie, rehabilitada actualmente se encuentra la Sociedade de Caza e Pesca A Venatoira.\nDOG: 30-03-2012\nhttps://goo.gl/maps/7zBJL",
         "Fuente_principal": "",
         "Fuentes_adicionales": "",
-        "Enlaces_origen": "https://www.youtube.com/watch?v=0kfNeYSQl7s | https://www.youtube.com/embed/0kfNeYSQl7s | https://img.youtube.com/vi/0kfNeYSQl7s/hqdefault.jpg | https://goo.gl/maps/7zBJL",
+        "Enlaces_origen": "",
         "Enlace_original_mapa": "https://goo.gl/maps/7zBJL",
         "Street_View": "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=43.4838585,-7.8441846",
         "Google_Maps": "https://www.google.com/maps/search/?api=1&query=43.4838585,-7.8441846",
@@ -6351,10 +6351,10 @@
         "Origen": "My Maps / KML",
         "ID_origen": 3,
         "Fecha_importacion": "2026-09-12",
-        "Fecha_revision": "",
+        "Fecha_revision": "2026-09-13",
         "Publicado": "SI",
         "Activo": "SI",
-        "Version_registro": 1,
+        "Version_registro": 2,
         "Observaciones": "",
         "Descripcion_HTML_original": "<a href=\"https://www.youtube.com/watch?v=0kfNeYSQl7s\"><img src=\"https://img.youtube.com/vi/0kfNeYSQl7s/hqdefault.jpg\" height=\"200\" width=\"auto\" /></a><br><br><a href=\"https://www.youtube.com/embed/0kfNeYSQl7s\">https://www.youtube.com/embed/0kfNeYSQl7s</a><br><br>AC-101 PK 4+510 a la altura del actual trazado, la casilla se encuentra en el antiguo trazado de la AC-101, antigua LC-101.<br>Término de As Pontes de García Rodríguez (A Coruña).<br>Estado actual: en pie, rehabilitada actualmente se encuentra la Sociedade de Caza e Pesca A Venatoira.<br>DOG: 30-03-2012<br>https://goo.gl/maps/7zBJL",
         "Estilo_origen": "#icon-503-DB4436-labelson",
@@ -21925,8 +21925,8 @@
         "Localidad": "",
         "Direccion_Paraje": "",
         "Carretera_historica": "",
-        "Carretera_actual": "",
-        "PK": "",
+        "Carretera_actual": "N-651",
+        "PK": "26+120",
         "Ruta_itinerario_historico": "",
         "Numero_viviendas": "",
         "Dependencias_camineros": "",
