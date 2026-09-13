@@ -1808,45 +1808,6 @@ button,input,select{
 </style>
 
 
-<style id="encuadre-espana-con-canarias">
-/* Encuadre inicial: Península + Baleares en grande y Canarias en recuadro */
-#canaryInsetWrap{
-  position:absolute;
-  z-index:690;
-  left:448px;
-  bottom:46px;
-  width:205px;
-  height:132px;
-  background:#fff;
-  border:1px solid rgba(20,31,48,.18);
-  border-radius:10px;
-  box-shadow:0 5px 16px rgba(20,31,48,.16);
-  overflow:hidden;
-  pointer-events:none;
-}
-#canaryInset{
-  position:absolute;
-  inset:0;
-}
-.canary-inset-title{
-  position:absolute;
-  z-index:800;
-  left:7px;
-  top:6px;
-  padding:3px 7px;
-  border-radius:999px;
-  background:rgba(255,255,255,.93);
-  color:#263548;
-  font-size:10px;
-  font-weight:800;
-  box-shadow:0 1px 4px rgba(20,31,48,.12);
-}
-@media(max-width:920px){
-  #canaryInsetWrap{display:none}
-}
-</style>
-
-
 <style id="paso6-capas-ordenadas">
 .layers-panel{
   width:390px !important;
@@ -2224,14 +2185,464 @@ button,input,select{
 }
 </style>
 
+
+<style id="paso8-movil-definitivo">
+/* ==========================================================
+   PASO 8 — VERSIÓN MÓVIL DEFINITIVA
+   En móvil: mapa arriba y resultados/filtros como hoja inferior.
+   ========================================================== */
+
+@media (max-width:920px){
+  html,body,#app{
+    width:100%;
+    height:100dvh !important;
+    min-height:100dvh !important;
+    overflow:hidden !important;
+  }
+
+  /* Cabecera compacta */
+  .topbar{
+    position:absolute !important;
+    z-index:1200 !important;
+    top:6px !important;
+    left:6px !important;
+    right:6px !important;
+    height:auto !important;
+    min-height:78px !important;
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) auto !important;
+    grid-template-areas:
+      "project actions"
+      "title title" !important;
+    align-items:center !important;
+    gap:3px 7px !important;
+    padding:5px 7px 6px !important;
+    background:rgba(255,255,255,.97) !important;
+    border:1px solid rgba(20,31,48,.11) !important;
+    border-radius:13px !important;
+    box-shadow:0 5px 18px rgba(20,31,48,.15) !important;
+  }
+
+  .header-project{
+    grid-area:project !important;
+    min-width:0 !important;
+    display:flex !important;
+    align-items:center !important;
+    gap:6px !important;
+    overflow:hidden !important;
+  }
+  .header-project .brand-mark{
+    width:58px !important;
+    height:34px !important;
+    flex:0 0 58px !important;
+    padding:0 !important;
+  }
+  .header-project .brand-mark img{
+    width:100% !important;
+    height:100% !important;
+    object-fit:contain !important;
+  }
+  .project-copy{
+    min-width:0 !important;
+    max-width:none !important;
+  }
+  .project-name{
+    font-size:9.5px !important;
+    line-height:1.08 !important;
+    white-space:normal !important;
+    display:-webkit-box !important;
+    -webkit-line-clamp:2 !important;
+    -webkit-box-orient:vertical !important;
+    overflow:hidden !important;
+  }
+  .project-web{
+    margin-top:1px !important;
+    font-size:7.8px !important;
+    line-height:1 !important;
+  }
+
+  .header-center{
+    grid-area:title !important;
+    width:100% !important;
+    text-align:center !important;
+  }
+  .header-center .brand-title{
+    margin:1px 0 0 !important;
+    font-size:17px !important;
+    line-height:1 !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+  }
+
+  .header-actions{
+    grid-area:actions !important;
+    display:flex !important;
+    gap:4px !important;
+    justify-self:end !important;
+  }
+  .header-btn{
+    min-width:42px !important;
+    height:36px !important;
+    padding:0 7px !important;
+    gap:3px !important;
+    border-radius:9px !important;
+    font-size:10px !important;
+    touch-action:manipulation !important;
+  }
+  .header-btn svg{
+    width:15px !important;
+    height:15px !important;
+  }
+
+  /* Controles del mapa por debajo de la cabecera */
+  .leaflet-top{
+    top:88px !important;
+  }
+  .leaflet-left{
+    left:4px !important;
+  }
+  .leaflet-control-zoom a{
+    width:36px !important;
+    height:36px !important;
+    line-height:36px !important;
+    font-size:20px !important;
+  }
+
+  /* Panel de resultados como hoja inferior */
+  .sidebar{
+    position:absolute !important;
+    z-index:950 !important;
+    top:auto !important;
+    left:6px !important;
+    right:6px !important;
+    bottom:6px !important;
+    width:auto !important;
+    height:43dvh !important;
+    max-height:calc(100dvh - 102px) !important;
+    display:flex !important;
+    flex-direction:column !important;
+    overflow:hidden !important;
+    border-radius:17px 17px 11px 11px !important;
+    background:rgba(255,255,255,.985) !important;
+    box-shadow:0 -5px 22px rgba(20,31,48,.18) !important;
+    transition:height .22s ease !important;
+  }
+  .sidebar.collapsed{
+    height:78px !important;
+  }
+
+  .mobile-handle{
+    display:block !important;
+    width:48px !important;
+    height:5px !important;
+    flex:0 0 5px !important;
+    margin:7px auto 3px !important;
+    border-radius:999px !important;
+    background:#b9c2cb !important;
+    cursor:pointer !important;
+  }
+
+  .sidebar-head{
+    flex:0 0 auto !important;
+    max-height:28dvh !important;
+    overflow:auto !important;
+    padding:5px 9px 7px !important;
+    background:#fff !important;
+    scrollbar-width:thin !important;
+  }
+  .sidebar.collapsed .sidebar-head{
+    max-height:64px !important;
+    overflow:hidden !important;
+  }
+  .sidebar.collapsed .advanced-filter-title,
+  .sidebar.collapsed .advanced-filters,
+  .sidebar.collapsed .advanced-chips,
+  .sidebar.collapsed .sort-compact{
+    display:none !important;
+  }
+  .sidebar.collapsed .results-summary{
+    margin:0 !important;
+    padding:4px 2px 0 !important;
+    border:0 !important;
+  }
+
+  .advanced-filter-title{
+    margin-bottom:6px !important;
+  }
+  .advanced-filter-title strong{
+    font-size:16px !important;
+  }
+  .sidebar-clear{
+    min-height:32px !important;
+    padding:5px !important;
+  }
+
+  .sidebar-search-advanced{
+    grid-template-columns:minmax(0,1fr) 72px !important;
+    gap:5px !important;
+  }
+  .sidebar-search-advanced input{
+    height:38px !important;
+    font-size:13px !important;
+  }
+  .sidebar-search-advanced button{
+    min-height:38px !important;
+    font-size:11px !important;
+  }
+  .search-help{
+    display:none !important;
+  }
+
+  /* Los cinco tipos siguen accesibles, pero ocupan menos */
+  .type-icon-area{
+    margin:6px 0 !important;
+  }
+  .type-icon-strip{
+    display:grid !important;
+    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+    gap:3px !important;
+  }
+  .type-icon-strip .cat-chip{
+    height:58px !important;
+    min-height:58px !important;
+    padding:3px 1px !important;
+    border-radius:7px !important;
+  }
+  .type-icon-strip .mini-svg{
+    width:31px !important;
+    height:31px !important;
+    margin-bottom:1px !important;
+  }
+  .type-icon-strip .cat-chip b{
+    font-size:7.5px !important;
+    line-height:1 !important;
+  }
+
+  .advanced-grid{
+    gap:5px !important;
+    margin-top:5px !important;
+  }
+  .advanced-grid.three{
+    grid-template-columns:1fr 1fr !important;
+  }
+  .advanced-grid.three label:last-child{
+    grid-column:1/-1 !important;
+  }
+  .advanced-grid.two{
+    grid-template-columns:1fr 1fr !important;
+  }
+  .advanced-grid label>span{
+    font-size:9.5px !important;
+  }
+  .advanced-grid select,
+  #roadFilter.filter-search{
+    height:34px !important;
+    font-size:11px !important;
+  }
+
+  .results-summary{
+    position:sticky !important;
+    bottom:0 !important;
+    z-index:2 !important;
+    margin-top:6px !important;
+    padding:6px 1px 2px !important;
+    background:#fff !important;
+  }
+  .results-summary strong{
+    font-size:15px !important;
+  }
+  .sort-compact{
+    min-width:112px !important;
+  }
+
+  .results{
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    overflow:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+  }
+  .result{
+    padding:8px 9px !important;
+    min-height:58px !important;
+  }
+  .rtitle{
+    font-size:13px !important;
+  }
+  .rmeta{
+    font-size:10px !important;
+  }
+  .ricon-svg{
+    width:30px !important;
+    height:34px !important;
+  }
+  .more{
+    min-height:44px !important;
+    padding:9px !important;
+  }
+
+  /* Capas como hoja inferior independiente */
+  .panel,
+  .layers-panel{
+    position:absolute !important;
+    z-index:1300 !important;
+    top:auto !important;
+    left:6px !important;
+    right:6px !important;
+    bottom:6px !important;
+    width:auto !important;
+    max-height:76dvh !important;
+    border-radius:17px !important;
+    overflow:auto !important;
+    box-shadow:0 -6px 28px rgba(20,31,48,.22) !important;
+  }
+  .layers-head{
+    position:sticky !important;
+    top:0 !important;
+    z-index:5 !important;
+  }
+  .layer-content{
+    min-height:58px !important;
+  }
+
+  /* Ficha como hoja inferior, por encima del listado */
+  .card{
+    position:absolute !important;
+    z-index:1400 !important;
+    top:auto !important;
+    left:6px !important;
+    right:6px !important;
+    bottom:6px !important;
+    width:auto !important;
+    max-height:72dvh !important;
+    border-radius:17px !important;
+    box-shadow:0 -7px 30px rgba(20,31,48,.24) !important;
+    overscroll-behavior:contain !important;
+  }
+  .card-head{
+    position:sticky !important;
+    top:0 !important;
+    z-index:4 !important;
+    min-height:65px !important;
+    padding:8px 43px 8px 10px !important;
+  }
+  .card-title{
+    font-size:18px !important;
+  }
+  .card-type{
+    font-size:9.5px !important;
+  }
+  .card-icon-small,
+  .card-icon-small img{
+    width:36px !important;
+    height:41px !important;
+  }
+  .info-row{
+    grid-template-columns:108px minmax(0,1fr) !important;
+    min-height:34px !important;
+    font-size:11px !important;
+  }
+  .info-row>b,
+  .info-row>span{
+    padding:7px !important;
+  }
+  .paso7-actions a{
+    min-height:42px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+  }
+
+  /* Indicador del mapa: pequeño y por encima de la hoja inferior */
+  #mapChip.map-chip{
+    left:50% !important;
+    right:auto !important;
+    bottom:calc(43dvh + 12px) !important;
+    transform:translateX(-50%) !important;
+    padding:5px 9px !important;
+    font-size:9px !important;
+  }
+  .sidebar.collapsed ~ #mapChip.map-chip,
+  #mapChip.map-chip{
+    pointer-events:none !important;
+  }
+
+  /* Atribución discreta; no debe tapar el listado */
+  .leaflet-control-attribution{
+    font-size:8px !important;
+    max-width:65vw !important;
+  }
+}
+
+@media (max-width:560px){
+  .topbar{
+    min-height:74px !important;
+  }
+  .header-project .brand-mark{
+    width:49px !important;
+    height:30px !important;
+    flex-basis:49px !important;
+  }
+  .project-name{
+    font-size:8.5px !important;
+  }
+  .project-web{
+    font-size:7px !important;
+  }
+  .header-center .brand-title{
+    font-size:16px !important;
+  }
+  .header-btn{
+    min-width:37px !important;
+    height:34px !important;
+    padding:0 5px !important;
+    font-size:9px !important;
+  }
+  .header-btn svg{
+    width:14px !important;
+    height:14px !important;
+  }
+  .leaflet-top{
+    top:83px !important;
+  }
+
+  .sidebar{
+    height:45dvh !important;
+  }
+  #mapChip.map-chip{
+    bottom:calc(45dvh + 11px) !important;
+  }
+  .sidebar-head{
+    max-height:30dvh !important;
+  }
+}
+
+@media (max-width:920px) and (orientation:landscape){
+  .topbar{
+    min-height:61px !important;
+    grid-template-columns:minmax(0,1fr) auto !important;
+  }
+  .header-center .brand-title{
+    font-size:15px !important;
+  }
+  .project-web{
+    display:none !important;
+  }
+  .sidebar{
+    height:46dvh !important;
+  }
+  .sidebar-head{
+    max-height:28dvh !important;
+  }
+  #mapChip.map-chip{
+    bottom:calc(46dvh + 10px) !important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div id="app">
   <div id="map"></div>
-  <div id="canaryInsetWrap" aria-label="Mapa de las Islas Canarias">
-    <div class="canary-inset-title">Islas Canarias <span id="canaryCount"></span></div>
-    <div id="canaryInset"></div>
-  </div>
 
   <header class="topbar">
     <div class="header-project">
@@ -2792,48 +3203,6 @@ function cardIcon(c){ return `<span class="card-svg">${svgIcon(c)}</span>`; }
 
 const map=L.map("map",{zoomControl:true,preferCanvas:true,minZoom:2});
 
-const canaryBounds=L.latLngBounds([[27.25,-18.4],[29.65,-13.25]]);
-const canaryMap=L.map("canaryInset",{
-  zoomControl:false,
-  attributionControl:false,
-  dragging:false,
-  scrollWheelZoom:false,
-  doubleClickZoom:false,
-  boxZoom:false,
-  keyboard:false,
-  tap:false,
-  touchZoom:false,
-  preferCanvas:true
-});
-L.tileLayer("https://www.ign.es/wmts/ign-base?service=WMTS&request=GetTile&version=1.0.0&layer=IGNBaseTodo&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{
-  maxZoom:20
-}).addTo(canaryMap);
-const canaryPoints=L.layerGroup().addTo(canaryMap);
-canaryMap.fitBounds(canaryBounds,{padding:[4,4],animate:false});
-
-function updateCanaryInset(features){
-  canaryPoints.clearLayers();
-  let count=0;
-  features.forEach(f=>{
-    const center=centerOf(f);
-    if(!center) return;
-    const lat=center[0], lon=center[1];
-    if(lat>=27.0 && lat<=30.0 && lon>=-19.0 && lon<=-13.0){
-      const cat=CATEGORY[categoryOf(f)]||CATEGORY.CPC;
-      L.circleMarker(center,{
-        radius:3.3,
-        color:"#ffffff",
-        weight:1,
-        fillColor:cat.color,
-        fillOpacity:.95,
-        interactive:false
-      }).addTo(canaryPoints);
-      count++;
-    }
-  });
-  const cc=$("canaryCount");
-  if(cc) cc.textContent=count?`(${count})`:"";
-}
 const baseLayers={
   osm:L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"&copy; OpenStreetMap contributors"}),
   ignBase:L.tileLayer("https://www.ign.es/wmts/ign-base?service=WMTS&request=GetTile&version=1.0.0&layer=IGNBaseTodo&style=default&tilematrixset=GoogleMapsCompatible&format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}",{maxZoom:20,attribution:"&copy; IGN"}),
@@ -2890,7 +3259,6 @@ function renderMap(features,fit){
     addGeometry(f);
   });
   cluster.addLayers(markers);
-  updateCanaryInset(features);
   if(!$("showMarkers").checked && map.hasLayer(cluster)) map.removeLayer(cluster);
   else if($("showMarkers").checked && !map.hasLayer(cluster)) map.addLayer(cluster);
   if(!$("showGeometries").checked && map.hasLayer(geometries)) map.removeLayer(geometries);
@@ -3217,6 +3585,10 @@ function selectFeature(f,zoom=true){
   }
 
   $("card").classList.add("open");
+  if(window.innerWidth<=920){
+    $("sidebar").classList.add("collapsed");
+    $("layersPanel").classList.remove("open");
+  }
 
   if(selectedGeometry){ map.removeLayer(selectedGeometry); selectedGeometry=null; }
   if(f.geometry && f.geometry.type!=="Point"){
@@ -3248,26 +3620,20 @@ function syncTopButtons(){
 
 
 function fitSpain(){
-  /* Encuadre más cercano de España:
-     Península y Baleares ocupan casi todo el área visible del mapa.
-     Canarias sigue en su recuadro independiente. */
-  const bounds=L.latLngBounds([[35.35,-9.75],[43.95,4.45]]);
+  /* A partir de esta versión el encuadre inicial se centra en la Península. */
+  const bounds=L.latLngBounds([[35.55,-9.65],[43.95,3.35]]);
   if(window.innerWidth>920){
     map.fitBounds(bounds,{
       paddingTopLeft:[455,118],
-      paddingBottomRight:[26,28],
-      maxZoom:6.45,
+      paddingBottomRight:[28,30],
+      maxZoom:6.6,
       animate:false
     });
-    setTimeout(()=>{
-      canaryMap.invalidateSize(false);
-      canaryMap.fitBounds(canaryBounds,{padding:[4,4],animate:false});
-    },80);
   }else{
     map.fitBounds(bounds,{
-      paddingTopLeft:[20,96],
-      paddingBottomRight:[20,Math.max(110,Math.round(window.innerHeight*.44)+18)],
-      maxZoom:6.2,
+      paddingTopLeft:[14,92],
+      paddingBottomRight:[14,Math.max(92,Math.round(window.innerHeight*.43)+12)],
+      maxZoom:6.25,
       animate:false
     });
   }
@@ -3331,8 +3697,13 @@ $("filterBtn").onclick=()=>{
 };
 
 function toggleLayersPanel(){
+  const opening=!$("layersPanel").classList.contains("open");
   $("layersPanel").classList.toggle("open");
+  if(opening && window.innerWidth<=920){
+    $("sidebar").classList.add("collapsed");
+  }
   syncTopButtons();
+  setTimeout(()=>map.invalidateSize(),120);
 }
 
 $("layersBtn").onclick=toggleLayersPanel;
@@ -3357,7 +3728,11 @@ $("copyCoords").onclick=async()=>{
   }catch(_){}
 };
 
-$("cardClose").onclick=()=>{ $("card").classList.remove("open"); if(selectedGeometry){map.removeLayer(selectedGeometry);selectedGeometry=null;} };
+$("cardClose").onclick=()=>{
+  $("card").classList.remove("open");
+  if(selectedGeometry){map.removeLayer(selectedGeometry);selectedGeometry=null;}
+  if(window.innerWidth<=920) $("sidebar").classList.remove("collapsed");
+};
 function toggleSheet(){ if(window.innerWidth<=920)$("sidebar").classList.toggle("collapsed"); }
 $("mobileHandle").onclick=toggleSheet;
 const collapseBtn=$("collapseBtn");
