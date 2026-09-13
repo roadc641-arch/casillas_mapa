@@ -377,10 +377,14 @@ a{text-decoration:none}
 
   <header class="topbar">
     <div class="brand">
-      <div class="brand-mark">⌂</div>
+      <div class="brand-mark"><img src="marca_casilla_cabecera.png?v=20260913-1" alt="Casilla de Peones Camineros"></div>
       <div>
         <div class="brand-title">Patrimonio caminero</div>
         <div class="brand-sub">Casillas de Peones Camineros de España · Provincias INE · v6.8</div>
+        <div class="brand-meta">
+          <a id="brandWeb" href="#" target="_blank" rel="noopener">Web</a> ·
+          <span id="visitDate">Fecha de visita</span>
+        </div>
       </div>
     </div>
 
@@ -1009,6 +1013,14 @@ state.query="";
 state.protection="";
 state.state="";
 state.province="";
+
+const currentWeb = location.href;
+$("brandWeb").href = currentWeb;
+$("brandWeb").textContent = currentWeb.replace(/^https?:\/\//,"");
+const now = new Date();
+$("visitDate").textContent = "Visita: " + now.toLocaleDateString("es-ES", {
+  day:"2-digit", month:"2-digit", year:"numeric"
+});
 
 renderCategoryUI();
 loadQueryParams();
