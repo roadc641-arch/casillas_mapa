@@ -2,9 +2,9 @@
   "proyecto": "Patrimonio Caminero de España",
   "base_maestra": "datos/patrimonio_caminero.geojson",
   "archivo_mapa": "datos_patrimonio_caminero_v3.js",
-  "version_base": "PC-1.6",
+  "version_base": "PC-1.8.1",
   "fecha": "2026-09-13",
   "registros": 2371,
-  "sha256_geojson": "9a43d5ddca40935a09226c5e576e184375dedbf8fd19c0aec5da9feade2c1745",
-  "sha256_js": "bd714c7acb6585584a8a637df2ee3fc5c82f40261cede99329c21c7b42d3a52c"
+  "sha256_geojson": "5c626001276da404ac3f533c36b4e083b522c3ad6a0eae43e484fe0643a9c503",
+  "sha256_js": "cd3ed233b3d6e85bed7655c9157d39d69595aacd3afd9478775b6e4d589da6e1"
 }
