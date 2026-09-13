@@ -775,6 +775,16 @@ a{text-decoration:none}
 }
 </style>
 
+
+<style id="paso4-sin-fotos">
+/* Ficha sin fotografías: conserva todos los datos y ocupa menos espacio */
+.card-body{padding-top:12px}
+.card{width:430px}
+@media(max-width:920px){
+  .card{max-height:66vh}
+}
+</style>
+
 </head>
 <body>
 <div id="app">
@@ -908,13 +918,6 @@ a{text-decoration:none}
 
     <div id="protBanner" class="prot-banner">🛡 Patrimonio protegido</div>
 
-    <div id="cardHero" class="card-hero">
-      <img id="cardHeroImg" alt="">
-      <div id="cardHeroFallback" class="card-hero-fallback"></div>
-      <button id="heroPrev" class="hero-nav hero-prev" type="button" aria-label="Foto anterior">‹</button>
-      <button id="heroNext" class="hero-nav hero-next" type="button" aria-label="Foto siguiente">›</button>
-    </div>
-
     <div class="card-body">
       <div class="detail-table">
         <div class="detail-row"><b>Carretera</b><span id="cardRoad">—</span></div>
@@ -948,11 +951,6 @@ a{text-decoration:none}
         <a id="mapsBtn" class="maps" target="_blank" rel="noopener">Google Maps</a>
         <a id="sourceBtn" class="source" target="_blank" rel="noopener" style="display:none">Documento de protección</a>
       </div>
-
-      <section id="gallerySection" class="card-section gallery-section" style="display:none">
-        <h4>Galería de imágenes</h4>
-        <div id="cardGallery" class="card-gallery"></div>
-      </section>
     </div>
   </section>
 
@@ -1036,9 +1034,6 @@ function statusBadgeClass(s){
   return "state-otro";
 }
 
-let cardGalleryUrls=[];
-let cardGalleryIndex=0;
-
 function extractUrls(v){
   const text=String(v||"");
   const matches=text.match(/https?:\/\/[^\s|<>"']+/gi) || [];
@@ -1046,59 +1041,6 @@ function extractUrls(v){
 }
 function looksLikePhotoUrl(url){
   return /hostedimage|usercontent|googleusercontent|\.jpe?g(?:\?|$)|\.png(?:\?|$)|\.webp(?:\?|$)|\.gif(?:\?|$)/i.test(url);
-}
-function uniqueValues(arr){
-  return [...new Set(arr.filter(Boolean))];
-}
-function galleryUrls(p){
-  const urls=[
-    ...extractUrls(p.Foto_principal),
-    ...extractUrls(p.Galeria_multimedia),
-    ...extractUrls(p.Enlaces_origen)
-  ].filter(looksLikePhotoUrl);
-  return uniqueValues(urls);
-}
-function setHeroPhoto(index){
-  const hero=$("cardHero"), img=$("cardHeroImg");
-  if(!cardGalleryUrls.length){
-    hero.classList.remove("has-photo","multi");
-    img.removeAttribute("src");
-    $("cardGallery").innerHTML="";
-    $("gallerySection").style.display="none";
-    return;
-  }
-  cardGalleryIndex=(index+cardGalleryUrls.length)%cardGalleryUrls.length;
-  hero.classList.add("has-photo");
-  hero.classList.toggle("multi",cardGalleryUrls.length>1);
-  img.src=cardGalleryUrls[cardGalleryIndex];
-  img.alt=$("cardTitle").textContent || "Fotografía";
-  document.querySelectorAll(".gallery-thumb").forEach((b,i)=>b.classList.toggle("active",i===cardGalleryIndex));
-}
-function renderGallery(p,c){
-  cardGalleryUrls=galleryUrls(p);
-  const box=$("cardGallery");
-  box.innerHTML="";
-  $("cardHeroFallback").innerHTML=cardIcon(c);
-  if(!cardGalleryUrls.length){
-    setHeroPhoto(0);
-    return;
-  }
-  cardGalleryUrls.forEach((url,i)=>{
-    const b=document.createElement("button");
-    b.type="button";
-    b.className="gallery-thumb"+(i===0?" active":"");
-    b.title=`Imagen ${i+1}`;
-    const im=document.createElement("img");
-    im.src=url;
-    im.alt=`Imagen ${i+1}`;
-    im.loading="lazy";
-    im.onerror=()=>{ b.style.display="none"; };
-    b.appendChild(im);
-    b.onclick=()=>setHeroPhoto(i);
-    box.appendChild(b);
-  });
-  $("gallerySection").style.display=cardGalleryUrls.length>1?"block":"none";
-  setHeroPhoto(0);
 }
 function renderSources(p){
   const entries=[];
@@ -1501,7 +1443,6 @@ function selectFeature(f,zoom=true){
   $("protInfo").style.display=protBits.length?"block":"none";
   $("protInfo").innerHTML=protBits.join("<br>");
 
-  renderGallery(p,c);
   renderSources(p);
 
   const street=String(p.Street_View||"").trim();
@@ -1607,18 +1548,6 @@ $("showMarkers").onchange=function(){ if(this.checked){if(!map.hasLayer(cluster)
 $("showGeometries").onchange=function(){ if(this.checked){if(!map.hasLayer(geometries))map.addLayer(geometries)}else if(map.hasLayer(geometries))map.removeLayer(geometries) };
 
 
-$("heroPrev").onclick=()=>setHeroPhoto(cardGalleryIndex-1);
-$("heroNext").onclick=()=>setHeroPhoto(cardGalleryIndex+1);
-$("cardHeroImg").onerror=()=>{
-  const broken=cardGalleryUrls[cardGalleryIndex];
-  cardGalleryUrls=cardGalleryUrls.filter(u=>u!==broken);
-  if(cardGalleryUrls.length) {
-    renderGallery({Foto_principal:cardGalleryUrls.join("|")} , $("card").dataset.cat||"CPC");
-  } else {
-    $("cardHero").classList.remove("has-photo","multi");
-    $("gallerySection").style.display="none";
-  }
-};
 $("copyCoords").onclick=async()=>{
   const value=$("cardCoords").textContent.trim();
   if(!value || value==="—") return;
