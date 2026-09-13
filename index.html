@@ -1749,6 +1749,64 @@ button,input,select{
 }
 </style>
 
+
+<style id="paso4-plegar-filtros">
+/* Mejora 4: al ocultar Filtros, casi todo el panel queda para resultados */
+.sidebar{
+  transition:width .18s ease;
+}
+.sidebar-head{
+  transition:padding .18s ease;
+}
+
+/* Ocultar completamente la zona de búsqueda y filtros */
+.sidebar.filters-hidden .advanced-filter-title,
+.sidebar.filters-hidden .advanced-filters,
+.sidebar.filters-hidden .advanced-chips{
+  display:none !important;
+}
+
+/* Dejar únicamente una cabecera mínima de resultados */
+.sidebar.filters-hidden .sidebar-head{
+  padding:9px 12px 8px !important;
+  border-bottom:1px solid var(--line) !important;
+}
+
+.sidebar.filters-hidden .results-summary{
+  margin:0 !important;
+  padding:0 !important;
+  border-top:0 !important;
+  align-items:center !important;
+}
+
+.sidebar.filters-hidden .results-summary strong{
+  font-size:18px !important;
+}
+
+.sidebar.filters-hidden .results-summary .subtle{
+  margin-top:2px !important;
+}
+
+/* El listado aprovecha todo el alto liberado */
+.sidebar.filters-hidden .results{
+  flex:1 1 auto !important;
+  min-height:0 !important;
+}
+
+/* Más registros visibles cuando los filtros están plegados */
+.sidebar.filters-hidden .result{
+  padding-top:7px !important;
+  padding-bottom:7px !important;
+}
+
+/* Indicación clara en el botón superior */
+#filterBtn.active{
+  background:#e7f4ea !important;
+  border-color:#9bc7a7 !important;
+  color:#205f35 !important;
+}
+</style>
+
 </head>
 <body>
 <div id="app">
@@ -2612,10 +2670,18 @@ $("resultSort").onchange=()=>{
 };
 $("moreBtn").onclick=()=>{state.visible+=100;renderResults()};
 
+function updateFilterButtonState(){
+  const hidden=$("sidebar").classList.contains("filters-hidden");
+  const btn=$("filterBtn");
+  btn.setAttribute("aria-expanded", hidden ? "false" : "true");
+  btn.title=hidden ? "Mostrar filtros" : "Ocultar filtros";
+}
+
 $("filterBtn").onclick=()=>{
   $("layersPanel").classList.remove("open");
   $("sidebar").classList.toggle("filters-hidden");
   if(window.innerWidth<=920) $("sidebar").classList.remove("collapsed");
+  updateFilterButtonState();
   syncTopButtons();
   setTimeout(()=>map.invalidateSize(),120);
 };
@@ -2786,6 +2852,7 @@ if(visitDate){
 }
 
 renderCategoryUI();
+updateFilterButtonState();
 syncTopButtons();
 loadQueryParams();
 setTimeout(()=>map.invalidateSize(),250);
