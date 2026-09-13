@@ -1662,6 +1662,75 @@ button,input,select{
 }
 </style>
 
+
+<style id="mapa-base-pequeno-abajo-v2">
+/* Versión correcta: pequeño, abajo y centrado */
+#mapChip.map-chip{
+  position:absolute !important;
+  z-index:700 !important;
+  left:50% !important;
+  right:auto !important;
+  top:auto !important;
+  bottom:10px !important;
+  transform:translateX(-50%) !important;
+
+  width:auto !important;
+  height:auto !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:none !important;
+  max-height:none !important;
+
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:6px !important;
+
+  padding:6px 12px !important;
+  margin:0 !important;
+
+  background:rgba(255,255,255,.96) !important;
+  border:1px solid rgba(20,31,48,.10) !important;
+  border-radius:999px !important;
+  box-shadow:0 4px 12px rgba(20,31,48,.14) !important;
+
+  color:#263548 !important;
+  font-size:11px !important;
+  font-weight:800 !important;
+  line-height:1 !important;
+  text-align:center !important;
+
+  cursor:default !important;
+  pointer-events:none !important;
+  user-select:none !important;
+  overflow:visible !important;
+  white-space:nowrap !important;
+}
+
+#mapChip.map-chip .map-chip-icon{
+  width:15px !important;
+  height:15px !important;
+  flex:0 0 auto !important;
+  fill:#315f8f !important;
+}
+
+#mapChip.map-chip span{
+  display:inline !important;
+}
+
+@media(max-width:920px){
+  #mapChip.map-chip{
+    bottom:calc(44vh + 12px) !important;
+    padding:5px 10px !important;
+    font-size:10px !important;
+  }
+  #mapChip.map-chip .map-chip-icon{
+    width:13px !important;
+    height:13px !important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div id="app">
