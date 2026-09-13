@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Mapa del patrimonio caminero de España · v6.8 colores definidos</title>
+<title>Mapa del patrimonio caminero de España</title>
+<!-- datos-conectados-gestion-pc-v1.5 -->
 <meta name="description" content="Mapa interactivo de casillas de peones camineros, agrupaciones de viviendas, monumentos, casas de postas y edificios de Obras Públicas.">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -2999,14 +3000,42 @@ button,input,select{
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-<script src="datos_patrimonio_caminero_v3.js?v=36"></script>
 
 <script>
-(function(){
+(async function(){
 "use strict";
 
 const $ = id => document.getElementById(id);
-const data = window.PATRIMONIO_CAMINERO_GEOJSON;
+
+/* Base maestra conectada con Gestión PC.
+   version.json se consulta sin caché; su SHA sirve para versionar el GeoJSON.
+   Así, al publicar desde Gestión PC, el mapa carga automáticamente la nueva base. */
+async function loadMasterData(){
+  let versionToken=String(Date.now());
+  try{
+    const vr=await fetch("datos/version.json?ts="+Date.now(),{cache:"no-store"});
+    if(vr.ok){
+      const v=await vr.json();
+      versionToken=String(v.sha256_geojson || v.sha256 || v.fecha || versionToken);
+    }
+  }catch(_e){}
+
+  const r=await fetch(
+    "datos/patrimonio_caminero.geojson?v="+encodeURIComponent(versionToken),
+    {cache:"default"}
+  );
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  return await r.json();
+}
+
+let data=null;
+try{
+  data=await loadMasterData();
+}catch(e){
+  console.error("No se pudo cargar la base maestra:",e);
+  data=window.PATRIMONIO_CAMINERO_GEOJSON || null;
+}
+
 if(!window.L || !data || !Array.isArray(data.features)){
   $("countNote").textContent = "No se pudo cargar Leaflet o la base de datos.";
   return;
