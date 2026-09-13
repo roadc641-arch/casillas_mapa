@@ -396,6 +396,145 @@ a{text-decoration:none}
 .card[data-cat="EOP"] .card-head{background:linear-gradient(135deg,#EEF5FA,#FFFFFF)}
 </style>
 
+
+<style id="paso2-fiel-mockup">
+/* PASO 2 — cabecera fiel al diseño aprobado */
+@media (min-width:921px){
+  .topbar{
+    top:14px;
+    left:14px;
+    right:14px;
+    height:124px;
+    box-sizing:border-box;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#fff;
+    border:1px solid rgba(20,31,48,.10);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:8px 24px;
+    pointer-events:auto;
+  }
+
+  .brand{
+    width:auto;
+    max-width:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:26px;
+    padding:0;
+    margin:0;
+    background:transparent;
+    border:0;
+    border-radius:0;
+    box-shadow:none;
+    overflow:visible;
+  }
+
+  .brand-mark{
+    width:220px;
+    height:98px;
+    padding:0;
+    margin:0;
+    border-radius:0;
+    background:#fff;
+    overflow:hidden;
+    flex:0 0 220px;
+  }
+
+  .brand-mark img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+    background:#fff;
+  }
+
+  .brand-copy{
+    min-width:0;
+    background:#fff;
+    text-align:center;
+    line-height:1.05;
+  }
+
+  .brand-title{
+    margin:0;
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:34px;
+    font-weight:700;
+    line-height:1;
+    white-space:nowrap;
+  }
+
+  .brand-sub{
+    margin-top:6px;
+    font-size:18px;
+    line-height:1.1;
+    color:var(--ink);
+    white-space:nowrap;
+  }
+
+  .brand-meta{
+    margin-top:7px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    font-size:13px;
+    line-height:1.1;
+    white-space:nowrap;
+    color:#5f6874;
+  }
+
+  .brand-meta a{
+    color:#a74f20;
+    font-weight:800;
+    text-decoration:none;
+    background:#fff;
+  }
+
+  /* Todo el manejo queda debajo de la cabecera */
+  .sidebar{
+    top:152px;
+  }
+
+  .panel{
+    top:152px;
+    max-height:calc(100vh - 166px);
+  }
+}
+
+/* Adaptación intermedia */
+@media (min-width:921px) and (max-width:1180px){
+  .topbar{height:112px}
+  .brand{gap:18px}
+  .brand-mark{width:180px;height:84px;flex-basis:180px}
+  .brand-title{font-size:29px}
+  .brand-sub{font-size:15px}
+  .brand-meta{font-size:11px}
+  .sidebar,.panel{top:140px}
+  .panel{max-height:calc(100vh - 154px)}
+}
+
+/* Móvil: conservar el funcionamiento actual sin tapar el mapa */
+@media (max-width:920px){
+  .topbar{
+    background:#fff;
+    border:1px solid rgba(20,31,48,.10);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    padding:6px 10px;
+  }
+  .brand{
+    background:#fff;
+    border:0;
+    box-shadow:none;
+  }
+}
+</style>
+
 </head>
 <body>
 <div id="app">
