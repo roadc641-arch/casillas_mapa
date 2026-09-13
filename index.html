@@ -505,6 +505,276 @@ a{text-decoration:none}
 </style>
 
 
+
+<style id="paso4-ficha-mejorada">
+/* PASO 4 — ficha patrimonial */
+.card{
+  width:430px;
+  max-height:calc(100vh - 132px);
+  right:14px;
+  bottom:14px;
+  overflow:auto;
+  background:#fff;
+  border:1px solid rgba(20,31,48,.10);
+  border-radius:15px;
+  box-shadow:0 12px 34px rgba(21,34,51,.18);
+}
+.card-head{
+  min-height:72px;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:12px 46px 10px 14px;
+  background:#fff !important;
+  border-bottom:1px solid #e3e8ec;
+  border-top:5px solid var(--cat);
+  position:relative;
+}
+.card-icon-small{
+  width:42px;
+  height:48px;
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+}
+.card-icon-small .card-svg,
+.card-icon-small .card-svg img{
+  width:42px !important;
+  height:48px !important;
+  object-fit:contain;
+  display:block;
+}
+.card-heading{min-width:0;flex:1}
+.card-title{
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:23px;
+  line-height:1.05;
+  font-weight:700;
+  color:#1f2b3d;
+}
+.card-type{
+  margin-top:4px;
+  font-size:11.5px;
+  color:var(--cat);
+  font-weight:700;
+}
+.card-close{
+  position:absolute;
+  right:9px;
+  top:9px;
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  border:0;
+  background:#f4f6f8;
+  color:#7b8794;
+  font-size:22px;
+}
+.card-close:hover{background:#e9edf1;color:#263445}
+
+.card-hero{
+  height:218px;
+  margin:10px 12px 0;
+  position:relative;
+  overflow:hidden;
+  border-radius:8px;
+  background:#edf1f4;
+  border:1px solid #dce2e7;
+}
+.card-hero img{
+  width:100%;
+  height:100%;
+  display:none;
+  object-fit:cover;
+}
+.card-hero.has-photo img{display:block}
+.card-hero-fallback{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,#f7f2ec,#edf2f6);
+}
+.card-hero.has-photo .card-hero-fallback{display:none}
+.card-hero-fallback .card-svg,
+.card-hero-fallback .card-svg img{
+  width:110px !important;
+  height:122px !important;
+  object-fit:contain;
+}
+.hero-nav{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:34px;
+  height:42px;
+  border:0;
+  border-radius:7px;
+  background:rgba(20,29,40,.72);
+  color:#fff;
+  font-size:27px;
+  line-height:1;
+  display:none;
+}
+.card-hero.multi .hero-nav{display:block}
+.hero-prev{left:8px}
+.hero-next{right:8px}
+
+.prot-banner{
+  padding:7px 14px;
+  background:#fff6d9;
+  border-bottom:1px solid #ead98f;
+  color:#725700;
+  font-size:11.5px;
+  font-weight:800;
+}
+
+.card-body{padding:11px 12px 14px}
+.detail-table{
+  overflow:hidden;
+  border:1px solid #dfe5ea;
+  border-radius:7px;
+  background:#fff;
+}
+.detail-row{
+  display:grid;
+  grid-template-columns:122px 1fr;
+  min-height:30px;
+  border-bottom:1px solid #e5eaee;
+  font-size:12px;
+}
+.detail-row:last-child{border-bottom:0}
+.detail-row b{
+  padding:7px 8px;
+  background:#f3f6f8;
+  color:#253247;
+  border-right:1px solid #dfe5ea;
+  font-weight:800;
+}
+.detail-row > span{
+  padding:7px 9px;
+  color:#243244;
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+.coord-value{
+  display:flex !important;
+  justify-content:space-between;
+  align-items:center;
+  gap:6px;
+}
+.copy-coords{
+  border:0;
+  background:transparent;
+  color:#315f98;
+  font-size:16px;
+  padding:0 2px;
+}
+.card-section{
+  margin-top:13px;
+  padding-top:11px;
+  border-top:1px solid #e2e7eb;
+}
+.card-section h4{
+  margin:0 0 7px;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:15px;
+  color:#1f2b3d;
+}
+.card-text{
+  font-size:12px;
+  line-height:1.5;
+  color:#3f4b59;
+  white-space:pre-line;
+}
+.protection-section{
+  font-size:12px;
+  line-height:1.5;
+  color:#4d5560;
+}
+.source-list{
+  display:grid;
+  gap:5px;
+  font-size:12px;
+}
+.source-item{
+  display:flex;
+  gap:7px;
+  align-items:flex-start;
+  color:#43505e;
+}
+.source-item::before{content:"•";font-weight:900;color:var(--cat)}
+.source-item a{
+  color:#245aa3;
+  text-decoration:underline;
+  overflow-wrap:anywhere;
+}
+.card-actions{
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-top:13px;
+}
+.card-actions a{
+  display:block;
+  text-align:center;
+  border-radius:8px;
+  padding:9px 7px;
+  font-size:11.5px;
+  font-weight:800;
+}
+.card-actions .source{
+  grid-column:1/-1;
+  background:#fff7df;
+  color:#725700;
+  border:1px solid #ead98f;
+}
+.card-gallery{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:2px 1px 5px;
+  scrollbar-width:thin;
+}
+.gallery-thumb{
+  width:78px;
+  height:62px;
+  flex:0 0 auto;
+  padding:0;
+  border:2px solid transparent;
+  border-radius:7px;
+  overflow:hidden;
+  background:#edf1f4;
+}
+.gallery-thumb.active{border-color:#2869b2}
+.gallery-thumb img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.gallery-empty{
+  font-size:12px;
+  color:#7a8490;
+}
+
+@media(max-width:920px){
+  .card{
+    left:10px;
+    right:10px;
+    bottom:10px;
+    width:auto;
+    max-height:66vh;
+    border-radius:15px;
+  }
+  .card-hero{height:190px}
+}
+@media(max-width:560px){
+  .card-title{font-size:20px}
+  .card-hero{height:170px}
+  .detail-row{grid-template-columns:105px 1fr;font-size:11.5px}
+}
+</style>
+
 </head>
 <body>
 <div id="app">
@@ -628,30 +898,61 @@ a{text-decoration:none}
 
   <section id="card" class="card">
     <div class="card-head">
-      <div id="cardIcon"></div>
-      <div>
+      <div id="cardIcon" class="card-icon-small"></div>
+      <div class="card-heading">
         <div id="cardTitle" class="card-title"></div>
         <div id="cardType" class="card-type"></div>
       </div>
-      <button id="cardClose" class="card-close">×</button>
+      <button id="cardClose" class="card-close" type="button" aria-label="Cerrar ficha">×</button>
     </div>
+
     <div id="protBanner" class="prot-banner">🛡 Patrimonio protegido</div>
+
+    <div id="cardHero" class="card-hero">
+      <img id="cardHeroImg" alt="">
+      <div id="cardHeroFallback" class="card-hero-fallback"></div>
+      <button id="heroPrev" class="hero-nav hero-prev" type="button" aria-label="Foto anterior">‹</button>
+      <button id="heroNext" class="hero-nav hero-next" type="button" aria-label="Foto siguiente">›</button>
+    </div>
+
     <div class="card-body">
-      <div class="grid">
-        <b>Carretera</b><span id="cardRoad">—</span>
-        <b>PK</b><span id="cardPk">—</span>
-        <b>Municipio</b><span id="cardMunicipio">—</span>
-        <b>Provincia</b><span id="cardProvincia">—</span>
-        <b>Estado</b><span id="cardState">—</span>
-        <b>Subtipo</b><span id="cardSubtype">—</span>
+      <div class="detail-table">
+        <div class="detail-row"><b>Carretera</b><span id="cardRoad">—</span></div>
+        <div class="detail-row"><b>PK aproximado</b><span id="cardPk">—</span></div>
+        <div class="detail-row"><b>Municipio</b><span id="cardMunicipio">—</span></div>
+        <div class="detail-row"><b>Provincia</b><span id="cardProvincia">—</span></div>
+        <div class="detail-row">
+          <b>Coordenadas</b>
+          <span class="coord-value"><span id="cardCoords">—</span><button id="copyCoords" class="copy-coords" type="button" title="Copiar coordenadas">⧉</button></span>
+        </div>
+        <div class="detail-row"><b>Tipo</b><span id="cardTypeRow">—</span></div>
+        <div class="detail-row"><b>Estado</b><span id="cardState">—</span></div>
+        <div class="detail-row"><b>Protección</b><span id="cardProtection">—</span></div>
+        <div id="subtypeRow" class="detail-row"><b>Subtipo</b><span id="cardSubtype">—</span></div>
       </div>
-      <div id="protInfo" class="desc" style="display:none"></div>
-      <div id="cardDesc" class="desc"></div>
+
+      <div id="protInfo" class="card-section protection-section" style="display:none"></div>
+
+      <section id="descriptionSection" class="card-section">
+        <h4>Descripción</h4>
+        <div id="cardDesc" class="card-text"></div>
+      </section>
+
+      <section id="sourcesSection" class="card-section" style="display:none">
+        <h4>Fuentes</h4>
+        <div id="cardSources" class="source-list"></div>
+      </section>
+
       <div class="card-actions">
         <a id="streetBtn" class="street" target="_blank" rel="noopener">Street View</a>
         <a id="mapsBtn" class="maps" target="_blank" rel="noopener">Google Maps</a>
-        <a id="sourceBtn" class="source" target="_blank" rel="noopener" style="display:none">Documentación de protección</a>
+        <a id="sourceBtn" class="source" target="_blank" rel="noopener" style="display:none">Documento de protección</a>
       </div>
+
+      <section id="gallerySection" class="card-section gallery-section" style="display:none">
+        <h4>Galería de imágenes</h4>
+        <div id="cardGallery" class="card-gallery"></div>
+      </section>
     </div>
   </section>
 
@@ -734,6 +1035,112 @@ function statusBadgeClass(s){
   if(s==="Desconocido") return "state-desconocido";
   return "state-otro";
 }
+
+let cardGalleryUrls=[];
+let cardGalleryIndex=0;
+
+function extractUrls(v){
+  const text=String(v||"");
+  const matches=text.match(/https?:\/\/[^\s|<>"']+/gi) || [];
+  return matches.map(x=>x.replace(/[),.;]+$/,""));
+}
+function looksLikePhotoUrl(url){
+  return /hostedimage|usercontent|googleusercontent|\.jpe?g(?:\?|$)|\.png(?:\?|$)|\.webp(?:\?|$)|\.gif(?:\?|$)/i.test(url);
+}
+function uniqueValues(arr){
+  return [...new Set(arr.filter(Boolean))];
+}
+function galleryUrls(p){
+  const urls=[
+    ...extractUrls(p.Foto_principal),
+    ...extractUrls(p.Galeria_multimedia),
+    ...extractUrls(p.Enlaces_origen)
+  ].filter(looksLikePhotoUrl);
+  return uniqueValues(urls);
+}
+function setHeroPhoto(index){
+  const hero=$("cardHero"), img=$("cardHeroImg");
+  if(!cardGalleryUrls.length){
+    hero.classList.remove("has-photo","multi");
+    img.removeAttribute("src");
+    $("cardGallery").innerHTML="";
+    $("gallerySection").style.display="none";
+    return;
+  }
+  cardGalleryIndex=(index+cardGalleryUrls.length)%cardGalleryUrls.length;
+  hero.classList.add("has-photo");
+  hero.classList.toggle("multi",cardGalleryUrls.length>1);
+  img.src=cardGalleryUrls[cardGalleryIndex];
+  img.alt=$("cardTitle").textContent || "Fotografía";
+  document.querySelectorAll(".gallery-thumb").forEach((b,i)=>b.classList.toggle("active",i===cardGalleryIndex));
+}
+function renderGallery(p,c){
+  cardGalleryUrls=galleryUrls(p);
+  const box=$("cardGallery");
+  box.innerHTML="";
+  $("cardHeroFallback").innerHTML=cardIcon(c);
+  if(!cardGalleryUrls.length){
+    setHeroPhoto(0);
+    return;
+  }
+  cardGalleryUrls.forEach((url,i)=>{
+    const b=document.createElement("button");
+    b.type="button";
+    b.className="gallery-thumb"+(i===0?" active":"");
+    b.title=`Imagen ${i+1}`;
+    const im=document.createElement("img");
+    im.src=url;
+    im.alt=`Imagen ${i+1}`;
+    im.loading="lazy";
+    im.onerror=()=>{ b.style.display="none"; };
+    b.appendChild(im);
+    b.onclick=()=>setHeroPhoto(i);
+    box.appendChild(b);
+  });
+  $("gallerySection").style.display=cardGalleryUrls.length>1?"block":"none";
+  setHeroPhoto(0);
+}
+function renderSources(p){
+  const entries=[];
+  const addText=(label,value)=>{
+    const v=String(value||"").trim();
+    if(!v) return;
+    const urls=extractUrls(v);
+    const plain=v.replace(/https?:\/\/[^\s|<>"']+/gi,"").replace(/\s*\|\s*/g," ").trim();
+    if(plain) entries.push({label,text:plain});
+    urls.filter(u=>!looksLikePhotoUrl(u)).forEach(u=>entries.push({label,url:u}));
+  };
+  addText("Fuente principal",p.Fuente_principal);
+  addText("Fuente adicional",p.Fuentes_adicionales);
+  addText("Fuente de protección",p.Fuente_proteccion);
+  addText("Enlace de origen",p.Enlaces_origen);
+
+  if(p.URL_proteccion){
+    entries.push({label:"Documentación de protección",url:String(p.URL_proteccion).trim()});
+  }
+
+  const seen=new Set();
+  const clean=entries.filter(e=>{
+    const key=(e.url||e.text||"").trim();
+    if(!key || seen.has(key)) return false;
+    seen.add(key); return true;
+  });
+
+  if(!clean.length){
+    $("sourcesSection").style.display="none";
+    $("cardSources").innerHTML="";
+    return;
+  }
+
+  $("sourcesSection").style.display="block";
+  $("cardSources").innerHTML=clean.map(e=>{
+    const content=e.url
+      ? `<a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.label)}</a>`
+      : `<span><b>${esc(e.label)}:</b> ${esc(e.text)}</span>`;
+    return `<div class="source-item">${content}</div>`;
+  }).join("");
+}
+
 function firstPhoto(p){
   const v=String(p.Foto_principal||"").trim();
   return /^https?:\/\//i.test(v) ? v : "";
@@ -1059,26 +1466,61 @@ function selectFeature(f,zoom=true){
   $("cardPk").textContent=p.PK||"—";
   $("cardMunicipio").textContent=p.Municipio_Concelho||p.Localidad||"—";
   $("cardProvincia").textContent=p.Provincia_Distrito || p.Provincia_INE || p.Provincia_original || "—";
+
+  const ctr=centerOf(f);
+  const lat=ctr ? Number(ctr[0]) : NaN;
+  const lon=ctr ? Number(ctr[1]) : NaN;
+  const coords=(Number.isFinite(lat)&&Number.isFinite(lon))
+    ? `${lat.toFixed(6)}, ${lon.toFixed(6)}`
+    : "—";
+  $("cardCoords").textContent=coords;
+
+  $("cardTypeRow").textContent=p.Tipo||CATEGORY[c].label;
   $("cardState").textContent=p.Estado_actual||p.Estado_categoria||"—";
-  $("cardSubtype").textContent=p.Subtipo||"—";
+
+  const protectionLabel=isProtected(f)
+    ? (p.Figura_proteccion||p.Nivel_proteccion||p.Proteccion||"Protegido")
+    : "Sin protección conocida";
+  $("cardProtection").textContent=protectionLabel;
+
+  const subtype=String(p.Subtipo||p.Tipo_monumento||"").trim();
+  $("cardSubtype").textContent=subtype||"—";
+  $("subtypeRow").style.display=subtype?"grid":"none";
+
   const desc=String(p.Descripcion||"").trim();
-  $("cardDesc").textContent=desc ? (desc.length>700?desc.slice(0,700)+"…":desc) : "Sin descripción adicional.";
+  $("cardDesc").textContent=desc || "Sin descripción adicional.";
 
   $("protBanner").classList.toggle("show",isProtected(f));
   const protBits=[
     p.Figura_proteccion ? `<b>Protección:</b> ${esc(p.Figura_proteccion)}` : "",
     p.Catalogo_registro ? `<b>Catálogo / plan:</b> ${esc(p.Catalogo_registro)}` : "",
     p.Fecha_proteccion ? `<b>Fecha:</b> ${esc(p.Fecha_proteccion)}` : "",
+    p.Numero_expediente ? `<b>Expediente:</b> ${esc(p.Numero_expediente)}` : "",
     p.Observaciones_proteccion ? esc(p.Observaciones_proteccion) : ""
   ].filter(Boolean);
-  $("protInfo").style.display=isProtected(f)?"block":"none";
+  $("protInfo").style.display=protBits.length?"block":"none";
   $("protInfo").innerHTML=protBits.join("<br>");
 
-  $("streetBtn").href=p.Street_View||"#";
-  $("mapsBtn").href=p.Google_Maps||"#";
+  renderGallery(p,c);
+  renderSources(p);
+
+  const street=String(p.Street_View||"").trim();
+  const maps=String(p.Google_Maps||"").trim() ||
+    ((Number.isFinite(lat)&&Number.isFinite(lon))
+      ? `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`
+      : "");
+  $("streetBtn").href=street||"#";
+  $("streetBtn").style.display=street?"block":"none";
+  $("mapsBtn").href=maps||"#";
+  $("mapsBtn").style.display=maps?"block":"none";
+
   if(p.URL_proteccion){
-    $("sourceBtn").href=p.URL_proteccion; $("sourceBtn").style.display="block";
-  } else $("sourceBtn").style.display="none";
+    $("sourceBtn").href=p.URL_proteccion;
+    $("sourceBtn").style.display="block";
+  }else{
+    $("sourceBtn").style.display="none";
+  }
+
   $("card").classList.add("open");
 
   if(selectedGeometry){ map.removeLayer(selectedGeometry); selectedGeometry=null; }
@@ -1093,6 +1535,7 @@ function selectFeature(f,zoom=true){
     if(zoom){
       cluster.zoomToShowLayer(m,()=>{
         map.setView(m.getLatLng(),Math.max(map.getZoom(),14));
+        if(window.innerWidth>920) setTimeout(()=>map.panBy([Math.round($("card").offsetWidth/2),0],{animate:false}),60);
       });
     } else map.panTo(m.getLatLng());
   }
@@ -1162,6 +1605,30 @@ document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>{ $(b.dataset
 document.querySelectorAll('input[name="base"]').forEach(r=>r.onchange=()=>{if(r.checked)setBase(r.value)});
 $("showMarkers").onchange=function(){ if(this.checked){if(!map.hasLayer(cluster))map.addLayer(cluster)}else if(map.hasLayer(cluster))map.removeLayer(cluster) };
 $("showGeometries").onchange=function(){ if(this.checked){if(!map.hasLayer(geometries))map.addLayer(geometries)}else if(map.hasLayer(geometries))map.removeLayer(geometries) };
+
+
+$("heroPrev").onclick=()=>setHeroPhoto(cardGalleryIndex-1);
+$("heroNext").onclick=()=>setHeroPhoto(cardGalleryIndex+1);
+$("cardHeroImg").onerror=()=>{
+  const broken=cardGalleryUrls[cardGalleryIndex];
+  cardGalleryUrls=cardGalleryUrls.filter(u=>u!==broken);
+  if(cardGalleryUrls.length) {
+    renderGallery({Foto_principal:cardGalleryUrls.join("|")} , $("card").dataset.cat||"CPC");
+  } else {
+    $("cardHero").classList.remove("has-photo","multi");
+    $("gallerySection").style.display="none";
+  }
+};
+$("copyCoords").onclick=async()=>{
+  const value=$("cardCoords").textContent.trim();
+  if(!value || value==="—") return;
+  try{
+    await navigator.clipboard.writeText(value);
+    const b=$("copyCoords"), old=b.textContent;
+    b.textContent="✓";
+    setTimeout(()=>b.textContent=old,900);
+  }catch(_){}
+};
 
 $("cardClose").onclick=()=>{ $("card").classList.remove("open"); if(selectedGeometry){map.removeLayer(selectedGeometry);selectedGeometry=null;} };
 function toggleSheet(){ if(window.innerWidth<=920)$("sidebar").classList.toggle("collapsed"); }
