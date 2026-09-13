@@ -28,46 +28,49 @@ a{text-decoration:none}
 
 .topbar{
   position:absolute;z-index:1000;top:14px;left:14px;right:14px;
-  display:flex;gap:10px;align-items:center;pointer-events:none;
+  display:flex;justify-content:center;pointer-events:none;
 }
-.brand,.search,.top-actions{pointer-events:auto}
+.brand{pointer-events:auto}
 .brand{
-  width:360px;display:flex;align-items:center;gap:10px;
-  padding:7px 10px;background:#fff;border:1px solid rgba(20,31,48,.08);
+  width:min(720px, calc(100vw - 28px));display:flex;align-items:center;justify-content:center;gap:12px;
+  padding:9px 14px;background:#fff;border:1px solid rgba(20,31,48,.08);
   border-radius:15px;box-shadow:var(--shadow);overflow:hidden;
 }
 .brand-mark{
-  width:84px;height:52px;border-radius:10px;display:grid;place-items:center;
+  width:92px;height:58px;border-radius:10px;display:grid;place-items:center;
   background:#fff;flex:0 0 auto;overflow:hidden;padding:3px
 }
 .brand-mark img{
   width:100%;height:100%;object-fit:contain;display:block;background:#fff
 }
-.brand-copy{min-width:0;line-height:1.05;background:#fff}
+.brand-copy{min-width:0;line-height:1.05;background:#fff;text-align:center}
 .brand-title{
-  font-family:Georgia,"Times New Roman",serif;font-size:18px;font-weight:700;
+  font-family:Georgia,"Times New Roman",serif;font-size:20px;font-weight:700;
   line-height:1.02;white-space:nowrap
 }
 .brand-sub{
-  font-size:10px;color:var(--muted);margin-top:2px;line-height:1.15;
+  font-size:11px;color:var(--muted);margin-top:3px;line-height:1.15;
   white-space:nowrap
 }
 .brand-meta{
-  display:flex;align-items:center;gap:4px;margin-top:3px;
+  display:flex;align-items:center;justify-content:center;gap:4px;margin-top:4px;
   font-size:9px;color:#6f7885;line-height:1.1;white-space:nowrap
 }
 .brand-meta a{color:#8a4d2a;text-decoration:none;font-weight:700}
 .search{
-  flex:1;max-width:760px;display:flex;background:rgba(255,255,255,.98);
-  border:1px solid rgba(20,31,48,.08);border-radius:15px;box-shadow:var(--shadow);overflow:hidden;
+  display:flex;background:rgba(255,255,255,.98);
+  border:1px solid rgba(20,31,48,.08);border-radius:12px;box-shadow:none;overflow:hidden;
 }
-.search input{flex:1;min-width:0;border:0;outline:0;background:transparent;padding:15px 16px;font-size:15px}
-.search button{border:0;padding:0 20px;background:var(--brand);color:#fff;font-weight:800}
-.top-actions{margin-left:auto;display:flex;gap:8px}
-.top-btn{
-  height:48px;padding:0 14px;border:1px solid rgba(20,31,48,.08);border-radius:14px;
-  background:rgba(255,255,255,.98);box-shadow:var(--shadow);font-weight:800;color:var(--ink)
+.search input{flex:1;min-width:0;border:0;outline:0;background:transparent;padding:13px 14px;font-size:14px}
+.search button{border:0;padding:0 18px;background:var(--brand);color:#fff;font-weight:800}
+.sidebar-search{margin-bottom:12px}
+.sidebar-search .search{width:100%;max-width:none}
+.sidebar-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.side-btn{
+  height:40px;padding:0 12px;border:1px solid #d7dde3;border-radius:10px;
+  background:#fff;color:var(--ink);font-weight:800;box-shadow:0 1px 0 rgba(20,31,48,.03)
 }
+.side-btn.active{background:#eef5ff;border-color:#bfd2ec;color:#1f56a7}
 
 .sidebar{
   position:absolute;z-index:850;top:82px;left:14px;bottom:14px;width:390px;
@@ -295,25 +298,34 @@ a{text-decoration:none}
 .leaflet-control-zoom,.leaflet-control-scale{box-shadow:0 4px 14px rgba(20,31,48,.15)!important}
 
 @media(max-width:920px){
-  .brand{display:none}
   .topbar{left:10px;right:10px;top:10px}
-  .search input{padding:13px 12px}
-  .search button{padding:0 14px}
-  .top-btn{height:44px;padding:0 11px}
+  .brand{width:min(680px, calc(100vw - 20px));padding:8px 10px}
+  .brand-mark{width:78px;height:50px}
+  .brand-title{font-size:18px}
+  .brand-sub{font-size:10px}
   .sidebar{
-    top:auto;left:10px;right:10px;bottom:10px;width:auto;height:41vh;
+    top:auto;left:10px;right:10px;bottom:10px;width:auto;height:44vh;
     border-radius:17px 17px 12px 12px;transition:height .22s ease
   }
-  .sidebar.collapsed{height:82px}
+  .sidebar.collapsed{height:92px}
   .mobile-handle{display:block;width:42px;height:5px;background:#c5cbd1;border-radius:999px;margin:8px auto 0}
   .sidebar-head{padding-top:8px}
   .category-strip{display:none}
-  .panel{top:64px;left:10px;right:10px;width:auto;max-height:64vh}
+  .panel{top:90px;left:10px;right:10px;width:auto;max-height:64vh}
   .card{left:10px;right:10px;bottom:10px;width:auto;max-height:58vh}
-  .map-chip{left:12px;bottom:calc(41vh + 18px)}
+  .map-chip{left:12px;bottom:calc(44vh + 18px)}
 }
 @media(max-width:560px){
+  .brand{gap:8px;padding:7px 9px}
+  .brand-mark{width:64px;height:42px}
+  .brand-title{font-size:16px}
+  .brand-sub{font-size:9.5px}
+  .brand-meta{font-size:8.5px}
   .search button{font-size:0;width:48px}
+  .search button:after{content:"⌕";font-size:22px}
+  .side-btn{font-size:13px}
+  .total{font-size:20px}
+}
   .search button:after{content:"⌕";font-size:22px}
   .top-actions{gap:6px}
   .top-btn{font-size:0;padding:0;width:43px}
@@ -384,6 +396,146 @@ a{text-decoration:none}
 .card[data-cat="EOP"] .card-head{background:linear-gradient(135deg,#EEF5FA,#FFFFFF)}
 </style>
 
+
+
+<style id="paso2-fiel-mockup">
+/* Cabecera reducida, manteniendo el diseño aprobado */
+@media (min-width:921px){
+  .topbar{
+    top:14px;
+    left:14px;
+    right:14px;
+    height:98px;
+    box-sizing:border-box;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#fff;
+    border:1px solid rgba(20,31,48,.10);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:6px 20px;
+    pointer-events:auto;
+  }
+
+  .brand{
+    width:auto;
+    max-width:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+    padding:0;
+    margin:0;
+    background:transparent;
+    border:0;
+    border-radius:0;
+    box-shadow:none;
+    overflow:visible;
+  }
+
+  .brand-mark{
+    width:168px;
+    height:68px;
+    padding:0;
+    margin:0;
+    border-radius:0;
+    background:#fff;
+    overflow:hidden;
+    flex:0 0 168px;
+  }
+
+  .brand-mark img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+    background:#fff;
+  }
+
+  .brand-copy{
+    min-width:0;
+    background:#fff;
+    text-align:center;
+    line-height:1.04;
+  }
+
+  .brand-title{
+    margin:0;
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:28px;
+    font-weight:700;
+    line-height:1;
+    white-space:nowrap;
+  }
+
+  .brand-sub{
+    margin-top:4px;
+    font-size:14px;
+    line-height:1.1;
+    color:var(--ink);
+    white-space:nowrap;
+  }
+
+  .brand-meta{
+    margin-top:5px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    font-size:11px;
+    line-height:1.1;
+    white-space:nowrap;
+    color:#5f6874;
+  }
+
+  .brand-meta a{
+    color:#a74f20;
+    font-weight:800;
+    text-decoration:none;
+    background:#fff;
+  }
+
+  .sidebar{
+    top:124px;
+  }
+
+  .panel{
+    top:124px;
+    max-height:calc(100vh - 138px);
+  }
+}
+
+/* Ajuste intermedio */
+@media (min-width:921px) and (max-width:1180px){
+  .topbar{height:90px}
+  .brand{gap:14px}
+  .brand-mark{width:150px;height:60px;flex-basis:150px}
+  .brand-title{font-size:24px}
+  .brand-sub{font-size:12px}
+  .brand-meta{font-size:10px}
+  .sidebar,.panel{top:114px}
+  .panel{max-height:calc(100vh - 128px)}
+}
+
+/* Móvil */
+@media (max-width:920px){
+  .topbar{
+    background:#fff;
+    border:1px solid rgba(20,31,48,.10);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    padding:6px 10px;
+  }
+  .brand{
+    background:#fff;
+    border:0;
+    box-shadow:none;
+  }
+}
+</style>
+
+
 </head>
 <body>
 <div id="app">
@@ -402,21 +554,21 @@ a{text-decoration:none}
         </div>
       </div>
     </div>
-
-    <div class="search">
-      <input id="q" type="search" placeholder="Buscar casilla, carretera, municipio, monumento…" autocomplete="off">
-      <button id="searchBtn" type="button">Buscar</button>
-    </div>
-
-    <div class="top-actions">
-      <button id="filterBtn" class="top-btn" type="button">Filtros</button>
-      <button id="layersBtn" class="top-btn" type="button">Capas</button>
-    </div>
   </header>
 
   <aside id="sidebar" class="sidebar">
     <div id="mobileHandle" class="mobile-handle"></div>
     <div class="sidebar-head">
+      <div class="sidebar-search">
+        <div class="search">
+          <input id="q" type="search" placeholder="Buscar casilla, carretera, municipio, monumento…" autocomplete="off">
+          <button id="searchBtn" type="button">Buscar</button>
+        </div>
+      </div>
+      <div class="sidebar-actions">
+        <button id="filterBtn" class="side-btn" type="button">Filtros</button>
+        <button id="layersBtn" class="side-btn" type="button">Capas</button>
+      </div>
       <div class="total-line">
         <div>
           <div class="total"><span id="totalCount">0</span> elementos</div>
@@ -745,7 +897,7 @@ function renderMap(features,fit){
   else if($("showGeometries").checked && !map.hasLayer(geometries)) map.addLayer(geometries);
 
   if(fit && bounds.length){
-    if(features.length===data.features.length) map.fitBounds([[27.3,-18.7],[44.4,4.8]],{padding:[25,25]});
+    if(features.length===data.features.length) fitSpain();
     else map.fitBounds(L.latLngBounds(bounds),{padding:[45,45],maxZoom:12});
   }
 }
@@ -976,6 +1128,31 @@ function selectFeature(f,zoom=true){
   if(window.innerWidth<=920) $("sidebar").classList.add("collapsed");
 }
 
+
+function syncTopButtons(){
+  const f=$("filterBtn"), l=$("layersBtn");
+  if(f) f.classList.toggle("active", $("filterPanel").classList.contains("open"));
+  if(l) l.classList.toggle("active", $("layersPanel").classList.contains("open"));
+}
+
+
+function fitSpain(){
+  const bounds = L.latLngBounds([[27.3,-18.7],[44.4,4.8]]);
+  if(window.innerWidth > 920){
+    map.fitBounds(bounds,{
+      paddingTopLeft:[430,132],
+      paddingBottomRight:[35,35],
+      animate:false
+    });
+  }else{
+    map.fitBounds(bounds,{
+      paddingTopLeft:[20,100],
+      paddingBottomRight:[20,Math.max(110, Math.round(window.innerHeight*0.44)+20)],
+      animate:false
+    });
+  }
+}
+
 function loadQueryParams(){
   const params=new URLSearchParams(location.search);
   const tipo=params.get("tipo");
@@ -985,7 +1162,7 @@ function loadQueryParams(){
   }
   const id=params.get("id");
   applyFilters(false);
-  map.fitBounds([[27.3,-18.7],[44.4,4.8]],{padding:[25,25]});
+  fitSpain();
   if(id && featureById.has(id)){
     const f=featureById.get(id);
     if(!state.types.has(categoryOf(f))){ state.types.add(categoryOf(f)); renderCategoryUI(); applyFilters(false); }
@@ -995,9 +1172,9 @@ function loadQueryParams(){
 
 $("searchBtn").onclick=()=>applyFilters(true);
 $("q").addEventListener("keydown",e=>{if(e.key==="Enter")applyFilters(true)});
-$("applyFilters").onclick=()=>{ document.querySelectorAll("#categoryChecks input[data-cat]").forEach(cb=>{ if(cb.checked)state.types.add(cb.dataset.cat); else state.types.delete(cb.dataset.cat); }); applyFilters(true); };
-$("clearFilters").onclick=clearFilters;
-$("sidebarClearFilters").onclick=clearFilters;
+$("applyFilters").onclick=()=>{ document.querySelectorAll("#categoryChecks input[data-cat]").forEach(cb=>{ if(cb.checked)state.types.add(cb.dataset.cat); else state.types.delete(cb.dataset.cat); }); applyFilters(true); syncTopButtons(); };
+$("clearFilters").onclick=()=>{ clearFilters(); syncTopButtons(); };
+$("sidebarClearFilters").onclick=()=>{ clearFilters(); syncTopButtons(); };
 $("resultSort").onchange=()=>{
   state.sort=$("resultSort").value;
   state.visible=100;
@@ -1005,9 +1182,9 @@ $("resultSort").onchange=()=>{
 };
 $("moreBtn").onclick=()=>{state.visible+=100;renderResults()};
 
-$("filterBtn").onclick=()=>{ $("layersPanel").classList.remove("open"); $("filterPanel").classList.toggle("open"); };
-$("layersBtn").onclick=()=>{ $("filterPanel").classList.remove("open"); $("layersPanel").classList.toggle("open"); };
-document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove("open"));
+$("filterBtn").onclick=()=>{ $("layersPanel").classList.remove("open"); $("filterPanel").classList.toggle("open"); syncTopButtons(); };
+$("layersBtn").onclick=()=>{ $("filterPanel").classList.remove("open"); $("layersPanel").classList.toggle("open"); syncTopButtons(); };
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>{ $(b.dataset.close).classList.remove("open"); syncTopButtons(); });
 
 document.querySelectorAll('input[name="base"]').forEach(r=>r.onchange=()=>{if(r.checked)setBase(r.value)});
 $("showMarkers").onchange=function(){ if(this.checked){if(!map.hasLayer(cluster))map.addLayer(cluster)}else if(map.hasLayer(cluster))map.removeLayer(cluster) };
@@ -1016,7 +1193,17 @@ $("showGeometries").onchange=function(){ if(this.checked){if(!map.hasLayer(geome
 $("cardClose").onclick=()=>{ $("card").classList.remove("open"); if(selectedGeometry){map.removeLayer(selectedGeometry);selectedGeometry=null;} };
 function toggleSheet(){ if(window.innerWidth<=920)$("sidebar").classList.toggle("collapsed"); }
 $("mobileHandle").onclick=toggleSheet; $("collapseBtn").onclick=toggleSheet;
-window.addEventListener("resize",()=>setTimeout(()=>map.invalidateSize(),100));
+let lastWideMode = window.innerWidth > 920;
+window.addEventListener("resize",()=>{
+  setTimeout(()=>{
+    map.invalidateSize();
+    const wideNow = window.innerWidth > 920;
+    if(wideNow !== lastWideMode && !new URLSearchParams(location.search).get("id")){
+      lastWideMode = wideNow;
+      fitSpain();
+    }
+  },120);
+});
 
 buildProvinceFilter();
 
@@ -1035,6 +1222,7 @@ $("visitDate").textContent = "Visita: " + new Intl.DateTimeFormat("es-ES", {
 }).format(now);
 
 renderCategoryUI();
+syncTopButtons();
 loadQueryParams();
 setTimeout(()=>map.invalidateSize(),250);
 })();
