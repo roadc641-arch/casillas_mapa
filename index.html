@@ -2942,9 +2942,8 @@ button,input,select{
       <section class="info-block">
         <h4>Localización</h4>
         <div class="info-grid">
-          <div id="rowRoad" class="info-row"><b>Carretera actual</b><span id="cardRoad">—</span></div>
+          <div id="rowRoad" class="info-row"><b>Carretera · PK</b><span id="cardRoad">—</span></div>
           <div id="rowRoadHistoric" class="info-row"><b>Carretera histórica</b><span id="cardRoadHistoric">—</span></div>
-          <div id="rowPk" class="info-row"><b>PK</b><span id="cardPk">—</span></div>
           <div id="rowMunicipio" class="info-row"><b>Municipio</b><span id="cardMunicipio">—</span></div>
           <div id="rowProvincia" class="info-row"><b>Provincia</b><span id="cardProvincia">—</span></div>
           <div id="rowCoords" class="info-row">
@@ -3524,10 +3523,12 @@ function selectFeature(f,zoom=true){
 
   const currentRoad=p.Carretera_actual||"";
   const historicRoad=p.Carretera_historica||"";
-  setCardRow("rowRoad","cardRoad",currentRoad || historicRoad,true);
+  const pk=String(p.PK||p.Punto_kilometrico||"").trim();
+  const roadMain=currentRoad || historicRoad;
+  const roadWithPk=[roadMain, pk ? `PK ${pk}` : ""].filter(Boolean).join(" · ");
+  setCardRow("rowRoad","cardRoad",roadWithPk,true);
   setCardRow("rowRoadHistoric","cardRoadHistoric",
     historicRoad && norm(historicRoad)!==norm(currentRoad) ? historicRoad : "",false);
-  setCardRow("rowPk","cardPk",p.PK||p.Punto_kilometrico||"",false);
   setCardRow("rowMunicipio","cardMunicipio",p.Municipio_Concelho||p.Localidad||"",true);
   setCardRow("rowProvincia","cardProvincia",
     p.Provincia_Distrito||p.Provincia_INE||p.Provincia_original||"",true);
