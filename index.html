@@ -1241,6 +1241,112 @@ a{text-decoration:none}
 }
 </style>
 
+
+<style id="ajuste-cabecera-y-carretera">
+/* Cabecera: tres zonas independientes para que el título nunca se superponga */
+@media (min-width:1241px){
+  .topbar{
+    grid-template-columns:460px minmax(360px,1fr) 250px !important;
+    column-gap:16px !important;
+  }
+  .header-project{
+    width:460px !important;
+    max-width:460px !important;
+    overflow:hidden !important;
+  }
+  .header-project .brand-mark{
+    width:178px !important;
+    height:72px !important;
+    flex-basis:178px !important;
+  }
+  .project-copy{
+    min-width:0 !important;
+    max-width:265px !important;
+  }
+  .project-name{
+    font-size:15px !important;
+    white-space:normal !important;
+    line-height:1.08 !important;
+  }
+  .project-web{
+    font-size:11px !important;
+  }
+  .header-center{
+    width:100% !important;
+    min-width:0 !important;
+    overflow:hidden !important;
+  }
+  .header-center .brand-title{
+    font-size:31px !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+  }
+  .header-actions{
+    width:250px !important;
+    justify-content:flex-end !important;
+  }
+}
+
+/* Pantallas de portátil: reducir de forma progresiva, sin superposición */
+@media (min-width:921px) and (max-width:1240px){
+  .topbar{
+    grid-template-columns:340px minmax(260px,1fr) 210px !important;
+    column-gap:10px !important;
+  }
+  .header-project{
+    width:340px !important;
+    max-width:340px !important;
+    overflow:hidden !important;
+  }
+  .header-project .brand-mark{
+    width:105px !important;
+    height:60px !important;
+    flex-basis:105px !important;
+  }
+  .project-copy{
+    min-width:0 !important;
+    max-width:225px !important;
+  }
+  .project-name{
+    font-size:12px !important;
+    white-space:normal !important;
+    line-height:1.08 !important;
+  }
+  .project-web{font-size:9.5px !important}
+  .header-center{
+    width:100% !important;
+    min-width:0 !important;
+    overflow:hidden !important;
+  }
+  .header-center .brand-title{
+    font-size:25px !important;
+    white-space:nowrap !important;
+  }
+  .header-actions{
+    width:210px !important;
+    justify-content:flex-end !important;
+  }
+}
+
+/* El buscador de carretera tiene el mismo aspecto que los desplegables */
+.advanced-grid input.filter-search{
+  width:100%;
+  height:34px;
+  min-width:0;
+  border:1px solid #cbd6e0;
+  border-radius:7px;
+  background:#fff;
+  color:#263548;
+  padding:0 9px;
+  font-size:10.5px;
+  outline:none;
+}
+.advanced-grid input.filter-search:focus{
+  border-color:#6d9ed4;
+  box-shadow:0 0 0 2px rgba(70,126,185,.12);
+}
+</style>
+
 </head>
 <body>
 <div id="app">
@@ -1334,7 +1440,8 @@ a{text-decoration:none}
         <div class="advanced-grid one">
           <label>
             <span>Carretera</span>
-            <select id="roadFilter"><option value="">Todas</option></select>
+            <input id="roadFilter" class="filter-search" type="search"
+                   placeholder="Buscar carretera…" autocomplete="off">
           </label>
         </div>
       </div>
@@ -1582,7 +1689,7 @@ function renderActiveFilters(){
   if(state.state) chips.push(state.state);
   if(state.province) chips.push(currentProvinceLabel());
   if(state.municipality) chips.push(`Municipio: ${$("municipalityFilter").selectedOptions[0]?.textContent||state.municipality}`);
-  if(state.road) chips.push(`Carretera: ${$("roadFilter").selectedOptions[0]?.textContent||state.road}`);
+  if(state.road) chips.push(`Carretera: ${$("roadFilter").value.trim()}`);
   if(state.query) chips.push(`Buscar: ${$("qSidebar").value.trim()}`);
 
   $("activeFilterChips").innerHTML = chips.length
@@ -1798,33 +1905,20 @@ function buildAdvancedFilters(){
   });
 
   const municipalities=new Map();
-  const roads=new Map();
 
   data.features.forEach(f=>{
     const p=f.properties||{};
     const muni=String(p.Municipio_Concelho||p.Localidad||"").trim();
     if(muni) municipalities.set(norm(muni),muni);
-
-    [p.Carretera_actual,p.Carretera_historica].forEach(v=>{
-      const road=String(v||"").trim();
-      if(road) roads.set(norm(road),road);
-    });
   });
 
   [...municipalities.entries()]
     .sort((a,b)=>a[1].localeCompare(b[1],"es",{sensitivity:"base",numeric:true}))
     .forEach(([value,label])=>{
       const o=document.createElement("option");
-      o.value=value; o.textContent=label;
+      o.value=value;
+      o.textContent=label;
       $("municipalityFilter").appendChild(o);
-    });
-
-  [...roads.entries()]
-    .sort((a,b)=>a[1].localeCompare(b[1],"es",{sensitivity:"base",numeric:true}))
-    .forEach(([value,label])=>{
-      const o=document.createElement("option");
-      o.value=value; o.textContent=label;
-      $("roadFilter").appendChild(o);
     });
 }
 
@@ -1843,7 +1937,7 @@ function matches(f){
   }
 
   if(state.road){
-    const roads=[p.Carretera_actual,p.Carretera_historica].filter(Boolean).map(norm);
+    const roads=norm([p.Carretera_actual,p.Carretera_historica].filter(Boolean).join(" "));
     if(!roads.includes(state.road)) return false;
   }
 
@@ -1870,7 +1964,7 @@ function applyFilters(fit=false){
   state.state=$("stateFilter").value;
   state.province=$("provinceFilter").value;
   state.municipality=$("municipalityFilter").value;
-  state.road=$("roadFilter").value;
+  state.road=norm($("roadFilter").value.trim());
 
   state.filtered=data.features.filter(matches);
   state.visible=100;
@@ -2094,9 +2188,11 @@ $("sidebarSearchBtn").onclick=()=>applyFilters(true);
 $("qSidebar").addEventListener("input",()=>scheduleAdvancedFilter(false));
 $("qSidebar").addEventListener("keydown",e=>{if(e.key==="Enter")applyFilters(true)});
 
-["typeFilter","stateFilter","protectionFilter","provinceFilter","municipalityFilter","roadFilter"].forEach(id=>{
+["typeFilter","stateFilter","protectionFilter","provinceFilter","municipalityFilter"].forEach(id=>{
   $(id).addEventListener("change",()=>applyFilters(true));
 });
+$("roadFilter").addEventListener("input",()=>scheduleAdvancedFilter(false));
+$("roadFilter").addEventListener("keydown",e=>{if(e.key==="Enter")applyFilters(true)});
 
 $("sidebarClearFilters").onclick=()=>clearFilters();
 $("resultSort").onchange=()=>{
