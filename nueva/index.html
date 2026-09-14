@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Casillas de Peones Camineros — Nueva web de prueba</title>
+<style>
+:root{--verde:#174c43;--verde2:#246c5d;--azul:#193d59;--tinta:#19252d;--gris:#6e777d;--crema:#f6f3ec;--linea:#dde3e1;--blanco:#fff;--sombra:0 8px 28px rgba(0,0,0,.08)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--tinta);line-height:1.5;background:#fff}a{text-decoration:none;color:inherit}.wrap{width:min(1220px,calc(100% - 36px));margin:auto}
+header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.97);border-bottom:1px solid var(--linea);backdrop-filter:blur(8px)}.head{height:80px;display:flex;align-items:center;justify-content:space-between;gap:22px}.brand{display:flex;align-items:center;gap:12px}.mark{width:52px;height:52px;border-radius:7px;background:var(--crema);display:grid;place-items:center;font-size:28px;border:1px solid #e4ddd1}.brand strong{font-family:Georgia,serif;font-size:18px;line-height:1.02;display:block}.brand small{display:block;color:var(--gris);font-size:11px}nav{display:flex;align-items:center;gap:20px;font-size:14px}nav>a,nav .drop>a{padding:28px 0 23px;border-bottom:3px solid transparent;display:block}nav>a:hover,nav .drop>a:hover{color:var(--verde);border-color:var(--verde)}.drop{position:relative}.drop-menu{display:none;position:absolute;top:64px;right:0;min-width:190px;background:white;border:1px solid var(--linea);border-radius:8px;box-shadow:var(--sombra);padding:7px}.drop:hover .drop-menu{display:block}.drop-menu a{display:block;padding:10px 12px;border-radius:6px}.drop-menu a:hover{background:#eef4f1;color:var(--verde)}.hamb{display:none;border:1px solid var(--linea);background:#fff;border-radius:7px;padding:8px 10px;font-size:20px}
+.hero{min-height:510px;color:#fff;display:flex;align-items:center;background:linear-gradient(90deg,rgba(12,25,24,.80),rgba(12,25,24,.46) 58%,rgba(12,25,24,.16)),url("https://image.jimcdn.com/app/cms/image/transf/dimension%3D666x10000%3Aformat%3Djpg/path/sdf1da10555ce35d4/image/ia3ae9e0d38329526/version/1769358555/image.jpg") center/cover no-repeat}.hero-content{max-width:700px;padding:70px 0}.hero h1{font-family:Georgia,serif;font-size:60px;line-height:1.03;margin:0 0 18px}.hero p{font-family:Georgia,serif;font-size:21px;max-width:650px;margin:0 0 28px}.buttons{display:flex;gap:12px;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;gap:9px;padding:13px 18px;border-radius:7px;font-weight:700}.primary{background:var(--verde2);color:#fff}.ghost{border:1px solid #fff;color:#fff;background:rgba(0,0,0,.15)}.hero-note{margin-top:32px;font-family:Georgia,serif;font-style:italic;font-size:18px}
+.stats{border-bottom:1px solid var(--linea)}.stats-grid{display:grid;grid-template-columns:repeat(4,1fr)}.stat{padding:23px 20px;border-right:1px solid var(--linea);display:flex;align-items:center;gap:12px}.stat:last-child{border-right:0}.ico{font-size:25px;color:var(--verde)}.stat strong{display:block;font-family:Georgia,serif;font-size:21px}.stat span{font-size:13px;color:var(--gris)}
+.section{padding:52px 0}.title-row{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:22px}.section h2{font-family:Georgia,serif;font-size:34px;margin:0;color:#163634}.intro{max-width:470px;color:var(--gris);font-size:15px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{border:1px solid var(--linea);border-radius:9px;overflow:hidden;background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.045);transition:.18s}.card:hover{transform:translateY(-2px);box-shadow:var(--sombra)}.card-img{height:180px;background:center/cover no-repeat}.card-body{padding:17px}.card h3{font-family:Georgia,serif;font-size:22px;margin:0 0 6px}.card p{margin:0;color:var(--gris);font-size:14px}.card-link{margin-top:12px;color:var(--verde);font-weight:700;font-size:13px;display:flex;justify-content:space-between}
+.project{background:#f6f8f7}.project-grid{display:grid;grid-template-columns:300px 1fr;gap:32px;align-items:center}.author-photo{min-height:280px;border-radius:10px;background:linear-gradient(rgba(24,65,57,.08),rgba(24,65,57,.18)),url("https://image.jimcdn.com/app/cms/image/transf/dimension%3D420x10000%3Aformat%3Djpg/path/sdf1da10555ce35d4/image/i1dca3c05c4fd66e3/version/1654981258/image.jpg") center/cover}.project h2{font-family:Georgia,serif;font-size:34px;margin:0 0 12px}.project p{color:#4f5d63}.mini-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.pill{background:#fff;border:1px solid var(--linea);padding:9px 12px;border-radius:999px;font-size:13px}
+.quote{min-height:300px;display:grid;place-items:center;text-align:center;color:#fff;margin-top:45px;background:linear-gradient(rgba(14,44,55,.40),rgba(14,44,55,.76)),url("https://image.jimcdn.com/app/cms/image/transf/dimension%3D420x10000%3Aformat%3Djpg/path/sdf1da10555ce35d4/image/i1dca3c05c4fd66e3/version/1654981258/image.jpg") center/cover no-repeat;border-radius:9px}.quote blockquote{font-family:Georgia,serif;font-size:29px;max-width:760px;padding:30px;margin:0}
+footer{background:#153f37;color:#fff}.foot{padding:28px 0;display:flex;justify-content:space-between;gap:25px;align-items:center}.foot strong{font-family:Georgia,serif}.foot small{opacity:.8}
+.notice{position:fixed;right:16px;bottom:16px;background:#173f37;color:white;padding:10px 13px;border-radius:8px;font-size:12px;box-shadow:var(--sombra);z-index:60}
+@media(max-width:900px){nav{display:none}.hamb{display:block}.brand small{display:none}.hero{min-height:560px}.hero h1{font-size:46px}.hero p{font-size:19px}.stats-grid{grid-template-columns:1fr 1fr}.stat:nth-child(2){border-right:0}.cards{grid-template-columns:1fr 1fr}.project-grid{grid-template-columns:1fr}.author-photo{min-height:320px}.title-row{display:block}.intro{margin-top:8px}}
+@media(max-width:620px){.wrap{width:min(100% - 24px,1220px)}.head{height:69px}.mark{width:45px;height:45px}.brand strong{font-size:15px}.hero h1{font-size:38px}.hero p{font-size:17px}.cards{grid-template-columns:1fr}.stat{padding:16px 10px}.stat strong{font-size:16px}.quote blockquote{font-size:23px}.foot{display:block}.foot small{display:block;margin-top:8px}.notice{left:12px;right:12px;text-align:center}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap head">
+    <a class="brand" href="./"><span class="mark">⌂</span><span><strong>CASILLAS<br>DE PEONES CAMINEROS</strong><small>Historia, territorio y patrimonio de nuestras carreteras</small></span></a>
+    <nav>
+      <a href="./">Inicio</a>
+      <a href="#proyecto">Proyecto</a>
+      <a href="#historia">Historia</a>
+      <a href="../">Mapa</a>
+      <a href="#fuentes">Fuentes</a>
+      <a href="#colabora">Colabora</a>
+      <div class="drop"><a href="#otros">Otros países ▾</a><div class="drop-menu"><a href="#otros">Puerto Rico</a><a href="#otros">Marruecos</a><a href="#otros">Portugal</a></div></div>
+    </nav>
+    <button class="hamb" aria-label="Menú">☰</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap"><div class="hero-content">
+    <h1>Pequeñas casillas,<br>grandes historias</h1>
+    <p>Un proyecto para descubrir, documentar y preservar las casillas de peones camineros de toda España.</p>
+    <div class="buttons"><a class="btn primary" href="../">⌖ Ver el mapa →</a><a class="btn ghost" href="#proyecto">Conocer el proyecto</a></div>
+    <div class="hero-note">“Pequeñas huellas, grandes caminos.”</div>
+  </div></div>
+</section>
+
+<section class="stats"><div class="wrap stats-grid">
+  <div class="stat"><span class="ico">⌂</span><div><strong>2.371</strong><span>elementos registrados</span></div></div>
+  <div class="stat"><span class="ico">⌁</span><div><strong>España</strong><span>inventario nacional</span></div></div>
+  <div class="stat"><span class="ico">▣</span><div><strong>Cartografía</strong><span>histórica y actual</span></div></div>
+  <div class="stat"><span class="ico">◎</span><div><strong>Patrimonio</strong><span>por descubrir</span></div></div>
+</div></section>
+
+<section class="section" id="historia"><div class="wrap">
+  <div class="title-row"><h2>Explora el proyecto</h2><div class="intro">Un viaje por la historia de nuestras carreteras a través de las casillas de peones camineros.</div></div>
+  <div class="cards">
+    <a class="card" href="../"><div class="card-img" style="background-image:url('https://image.jimcdn.com/app/cms/image/transf/dimension%3D420x10000%3Aformat%3Djpg/path/sdf1da10555ce35d4/image/i1dca3c05c4fd66e3/version/1654981258/image.jpg')"></div><div class="card-body"><h3>Mapa de casillas</h3><p>Localiza y explora las casillas en el territorio.</p><div class="card-link"><span>Entrar</span><span>→</span></div></div></a>
+    <div class="card"><div class="card-img" style="background-image:url('https://image.jimcdn.com/app/cms/image/transf/dimension%3D666x10000%3Aformat%3Dpng/path/sdf1da10555ce35d4/image/i486c13e17ade436c/version/1656225670/image.png')"></div><div class="card-body"><h3>Carreteras</h3><p>Contexto, trazados y evolución de nuestras vías.</p><div class="card-link"><span>Próximamente</span><span>→</span></div></div></div>
+    <div class="card"><div class="card-img" style="background-image:url('https://image.jimcdn.com/app/cms/image/transf/dimension%3D666x10000%3Aformat%3Djpg/path/sdf1da10555ce35d4/image/ia3ae9e0d38329526/version/1769358555/image.jpg')"></div><div class="card-body"><h3>Patrimonio</h3><p>Arquitectura, conservación y fichas documentales.</p><div class="card-link"><span>Próximamente</span><span>→</span></div></div></div>
+    <div class="card"><div class="card-img" style="background-image:url('https://image.jimcdn.com/app/cms/image/transf/dimension%3D420x10000%3Aformat%3Djpg/path/sdf1da10555ce35d4/image/if65a8c33d9eb4d5e/version/1654981274/image.jpg')"></div><div class="card-body"><h3>Historia</h3><p>El legado de quienes cuidaron nuestros caminos.</p><div class="card-link"><span>Próximamente</span><span>→</span></div></div></div>
+    <div class="card" id="fuentes"><div class="card-img" style="background-image:url('https://image.jimcdn.com/app/cms/image/transf/dimension%3D666x10000%3Aformat%3Dpng/path/sdf1da10555ce35d4/image/i486c13e17ade436c/version/1656225670/image.png')"></div><div class="card-body"><h3>Fuentes</h3><p>Bibliografía, archivos, cartografía y documentación.</p><div class="card-link"><span>Próximamente</span><span>→</span></div></div></div>
+    <div class="card" id="colabora"><div class="card-img" style="background-image:url('https://image.jimcdn.com/app/cms/image/transf/dimension%3D420x10000%3Aformat%3Djpg/path/sdf1da10555ce35d4/image/i1dca3c05c4fd66e3/version/1654981258/image.jpg')"></div><div class="card-body"><h3>Colabora</h3><p>Aporta fotografías, datos o correcciones al inventario.</p><div class="card-link"><span>Próximamente</span><span>→</span></div></div></div>
+  </div>
+  <div class="quote"><blockquote>“Las carreteras también cuentan historias. Y en sus márgenes, pequeñas casillas aún nos hablan del pasado.”</blockquote></div>
+</div></section>
+
+<section class="section project" id="proyecto"><div class="wrap project-grid">
+  <div class="author-photo"></div>
+  <div><h2>El proyecto</h2><p>La nueva web reunirá en un mismo lugar el inventario de casillas, la historia del cuerpo de peones camineros, las carreteras, publicaciones, documentación y el mapa interactivo que ya está en funcionamiento.</p><p>Esta página es una <strong>prueba independiente</strong>: la web actual de Jimdo y el mapa público no se han sustituido.</p><div class="mini-links"><span class="pill">El autor</span><span class="pill">Entrevistas y medios</span><span class="pill">Publicaciones</span><span class="pill">Proyectos relacionados</span></div></div>
+</div></section>
+
+<section class="section" id="otros"><div class="wrap">
+  <div class="title-row"><h2>En otros países</h2><div class="intro">Un espacio para comparar el patrimonio caminero español con construcciones y sistemas equivalentes de otros territorios.</div></div>
+  <div class="cards">
+    <div class="card"><div class="card-body"><h3>Puerto Rico</h3><p>Casillas, camineros y patrimonio viario.</p></div></div>
+    <div class="card"><div class="card-body"><h3>Marruecos</h3><p>Referencias históricas y construcciones relacionadas.</p></div></div>
+    <div class="card"><div class="card-body"><h3>Portugal</h3><p>Casas de cantoneiros y patrimonio de carreteras.</p></div></div>
+  </div>
+</div></section>
+
+<footer><div class="wrap foot"><strong>⌂ CASILLAS DE PEONES CAMINEROS</strong><small>Versión de prueba en GitHub Pages · La web pública actual permanece intacta.</small></div></footer>
+<div class="notice">VERSIÓN DE PRUEBA · /nueva/</div>
+</body>
+</html>
